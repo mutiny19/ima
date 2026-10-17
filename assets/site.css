@@ -56,3 +56,8 @@ code { font-family: var(--mono); font-size: .9em; }
 :root[data-theme="light"] .theme-toggle .i-sun { display: none; }
 :root[data-theme="light"] .theme-toggle .i-moon { display: inline; }
 :root[data-theme="dark"] .site-head { border-bottom: 1px solid var(--line); }
+
+/* Site-wide notice: everything here is for consideration only. */
+.site-notice { background: var(--signal-soft); color: var(--fg); border-bottom: 1px solid var(--line); }
+.site-notice .bar { max-width: 1200px; margin: 0 auto; padding: 9px 24px; font-size: 13.5px; line-height: 1.45; }
+.site-notice b { color: var(--signal); font-weight: 700; }
