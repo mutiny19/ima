@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>/* Dark by default; a visitor's choice is remembered. Runs before paint to avoid a flash. */
+(function () { var t; try { t = localStorage.getItem("ioc-theme"); } catch (e) {} document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark"); })();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Get on the Indiana mesh. A short path from a new radio to your first MeshCore message, plus where to find people, watch the mesh live, and set up a repeater. Every topic links to the people who maintain it.">
+<title>Indiana Off-Grid Comms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* One page. Start steps first, then people, live views, repeaters, other options. Everything links out. */
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 24px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.08; text-wrap: balance; }
+p { margin: 0; }
+section { padding-block: 48px; border-top: 1px solid var(--line); }
+section:first-of-type { border-top: 0; }
+h2 { font-size: 30px; font-weight: 800; margin-bottom: 8px; }
+.sub { color: var(--muted); max-width: 64ch; margin-bottom: 24px; }
+.sub a { color: var(--link); }
+a.out::after { content: " ↗"; font-size: .85em; }
+
+/* hero */
+.hero { background: var(--ink); color: var(--ink-fg); padding-block: 64px 56px; }
+.hero h1 { font-size: clamp(38px, 6vw, 64px); font-weight: 800; letter-spacing: -.01em; max-width: 16ch; }
+.hero p { color: #B9C4BF; font-size: 19px; max-width: 58ch; margin-top: 16px; }
+.hero .row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 700 16px/1 var(--body); padding: 14px 20px; border-radius: 8px; text-decoration: none; min-height: 48px; }
+.btn.primary { background: var(--beacon); color: #13201C; }
+.btn.ghost { border: 2px solid #4D5E57; color: var(--ink-fg); }
+.btn.ghost:hover, .btn.primary:hover { filter: brightness(1.08); }
+.hero .quiet { margin-top: 22px; font-size: 14px; color: #8A9A93; }
+
+/* steps */
+.steps { display: grid; gap: 14px; counter-reset: step; }
+.step { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+.step::before { counter-increment: step; content: counter(step); font: 800 26px/1 var(--display); color: var(--beacon); background: var(--signal-soft); border-radius: 10px; width: 56px; height: 56px; display: grid; place-items: center; }
+.step h3 { font-size: 21px; font-weight: 700; margin-bottom: 8px; }
+.step p + p { margin-top: 8px; }
+.step .warn { margin-top: 10px; padding: 10px 12px; border-left: 3px solid var(--beacon); background: var(--signal-soft); border-radius: 0 8px 8px 0; font-size: 15px; }
+.radio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 12px 0 4px; }
+.radio div { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.radio span { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.radio b { font-family: var(--mono); font-weight: 500; font-size: 17px; }
+.step ul { margin: 6px 0 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.step .src { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+/* link cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.card { display: grid; align-content: start; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; text-decoration: none; color: var(--fg); }
+.card:hover { border-color: var(--beacon); }
+.card b { font-size: 18px; font-weight: 700; font-family: var(--display); }
+.card b::after { content: " ↗"; color: var(--beacon); font-size: .8em; }
+.card small { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.card .tag { justify-self: start; font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--signal); background: var(--signal-soft); border-radius: 4px; padding: 5px 7px; margin-bottom: 4px; }
+.card.here { border-color: var(--beacon); background: var(--signal-soft); }
+.card.here b::after { content: " →"; }
+.note { font-size: 14px; color: var(--muted); margin-top: 16px; max-width: 70ch; }
+
+/* map: the official MeshCore Map embedded, Indiana in view */
+.mapframe { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); aspect-ratio: 16 / 10; }
+.mapframe iframe { width: 100%; height: 100%; border: 0; display: block; }
+@media (max-width: 640px) { .mapframe { aspect-ratio: 4 / 5; } }
+
+@media (max-width: 640px) {
+  .step { grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 16px; }
+  .step::before { width: 44px; height: 44px; font-size: 22px; }
+  .radio { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  section { padding-block: 36px; }
+}
+</style>
+</head>
+<body>
+<header class="site-head" id="top"><div class="bar">
+  <a class="brand" href="./"><svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#E8590C" stroke-width="2" aria-hidden="true"><path d="M16 28V12"/><circle cx="16" cy="10" r="2.5"/><path d="M10 4a9 9 0 0 0 0 12"/><path d="M22 4a9 9 0 0 1 0 12"/><path d="M6 1a14 14 0 0 0 0 18"/><path d="M26 1a14 14 0 0 1 0 18"/></svg>Indiana Off-Grid Comms</a>
+  <nav class="site-nav" aria-label="Site">
+    <a href="#map">Map</a>
+    <a href="#start">Start</a>
+    <a href="#people">People</a>
+    <a href="#live">Live</a>
+    <a href="#repeaters">Repeaters</a>
+    <a href="#more">More</a>
+    <a href="https://github.com/mutiny19/ima" target="_blank" rel="noopener">GitHub</a>
+    <a class="cta" href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Join Indiana Mesh</a>
+    <button type="button" class="theme-toggle" id="themeBtn" aria-label="Switch to light mode" title="Switch to light mode"><svg class="i-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  </nav>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <h1>Get on the Indiana mesh.</h1>
+  <p>Four steps from a new radio to your first message. No license, no account, nothing to configure for regions. Every topic here points to the people who maintain it, so you're always reading the current version.</p>
+  <div class="row">
+    <a class="btn primary" href="#start">Start here</a>
+    <a class="btn ghost" href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Say hi on Discord ↗</a>
+  </div>
+  <p class="quiet">Already on the air? Jump to <a href="#live" style="color:#B9C4BF">live views</a> or <a href="#repeaters" style="color:#B9C4BF">repeater setup</a>.</p>
+</div></div>
+
+<main class="wrap">
+
+<section id="map" aria-labelledby="map-h">
+  <h2 id="map-h">Repeaters around Indiana</h2>
+  <p class="sub">This is the official <a class="out" href="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" target="_blank" rel="noopener">MeshCore Map</a>, centred on Indiana and showing repeaters. Nothing is copied here: what you see is what their owners registered, as of right now.</p>
+  <div class="mapframe">
+    <iframe src="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" title="MeshCore Map, centred on Indiana, repeaters only" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allow="geolocation"></iframe>
+  </div>
+  <p class="note">Map not showing? <a class="out" href="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" target="_blank" rel="noopener">Open it on map.meshcore.io</a>. To add your own repeater, see <a class="out" href="https://docs.meshcore.io/faq/#512-q-how-do-i-add-a-node-to-the-meshcore-map" target="_blank" rel="noopener">the MeshCore FAQ</a>. Personal radios are never shown unless their owner chose to list them.</p>
+</section>
+
+<section id="start" aria-labelledby="start-h">
+  <h2 id="start-h">First radio to first message</h2>
+  <p class="sub">MeshCore is the text mesh most people in Indiana use. These four steps are everything a new user needs; the links go to the official MeshCore docs for anything deeper.</p>
+  <div class="steps">
+    <div class="step"><div>
+      <h3>Get a radio</h3>
+      <p>Any device on the <a class="out" href="https://flasher.meshcore.io/" target="_blank" rel="noopener">MeshCore flasher</a> list works. A small tracker with a built-in battery is the easiest start. Buy the <strong>US 915 MHz</strong> version.</p>
+      <p class="src">Not sure what to buy? The MeshCore FAQ covers <a class="out" href="https://docs.meshcore.io/faq/#12-q-what-do-you-need-to-start-using-meshcore" target="_blank" rel="noopener">what you need to start</a>, or ask on Discord before you order.</p>
+    </div></div>
+    <div class="step"><div>
+      <h3>Put the Companion firmware on it</h3>
+      <p>Open the <a class="out" href="https://flasher.meshcore.io/" target="_blank" rel="noopener">MeshCore flasher</a> in Chrome or Edge on a computer, plug the radio in by USB, pick your device, and choose <strong>Companion (Bluetooth)</strong>.</p>
+    </div></div>
+    <div class="step"><div>
+      <h3>Install the app and pick the USA preset</h3>
+      <p>Get the MeshCore app for <a class="out" href="https://apps.apple.com/nz/app/meshcore/id6742354151" target="_blank" rel="noopener">iPhone</a>, <a class="out" href="https://play.google.com/store/apps/details?id=com.liamcottle.meshcore.android" target="_blank" rel="noopener">Android</a>, or the <a class="out" href="https://app.meshcore.nz/" target="_blank" rel="noopener">web</a>. Connect over Bluetooth, give yourself a name, then in the radio settings choose the <strong id="pn">USA</strong> preset. It should read:</p>
+      <div class="radio">
+        <div><span>Frequency</span><b id="pf">910.525 MHz</b></div>
+        <div><span>Bandwidth</span><b id="pb">62.5 kHz</b></div>
+        <div><span>Spreading</span><b id="ps">SF7</b></div>
+        <div><span>Coding rate</span><b id="pc">CR5</b></div>
+      </div>
+      <p class="warn">New radios often arrive on a European setting. If you hear nothing, this is the first thing to check.</p>
+      <p class="src">These values come from MeshCore's own <a class="out" href="https://docs.meshcore.io/radio_presets/" target="_blank" rel="noopener">radio presets</a> list, which is what the app shows. If the two ever differ, the app is right.</p>
+    </div></div>
+    <div class="step"><div>
+      <h3>Say hello</h3>
+      <ul>
+        <li>Send a <strong>flood advert</strong> so nearby people and repeaters learn you're there.</li>
+        <li>Post in <strong>Public</strong>, or add the <code>#test</code> channel and send a test message.</li>
+        <li>"Heard repeats" after you send means a repeater picked you up.</li>
+      </ul>
+      <p class="src">Hear nothing? Recheck step 3, move the radio to a window or somewhere higher, then ask on <a class="out" href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Discord</a> where the nearest repeater is. Your radio only needs to reach one.</p>
+    </div></div>
+  </div>
+  <p class="note">Leave regions and scopes alone as a new user: the defaults reach everyone, including across state lines. If you later run a repeater, see <a href="#repeaters">repeaters</a>.</p>
+</section>
+
+<section id="people" aria-labelledby="people-h">
+  <h2 id="people-h">Find people near you</h2>
+  <p class="sub">Each group runs its own site or chat and keeps it current. Start with the statewide Discord, then the group closest to you. Near a state line, the neighbouring group is part of your local mesh too.</p>
+  <div class="cards">
+    <a class="card" href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener"><span class="tag">All of Indiana</span><b>Indiana Mesh on Discord</b><small>The statewide community. Ask where the closest repeater is and who's on the air.</small></a>
+    <a class="card" href="https://cimesh.net" target="_blank" rel="noopener"><span class="tag">Central Indiana</span><b>Central Indiana Mesh Network</b><small>Indianapolis and the surrounding counties.</small></a>
+    <a class="card" href="https://neimesh.net" target="_blank" rel="noopener"><span class="tag">Northeast Indiana</span><b>NEIMesh</b><small>Fort Wayne and the northeast counties.</small></a>
+    <a class="card" href="https://okimesh.org" target="_blank" rel="noopener"><span class="tag">Southeast Indiana · Ohio · Kentucky</span><b>OKI Mesh</b><small>The Cincinnati tri-state area, including southeast Indiana.</small></a>
+    <a class="card" href="https://chicagolandmesh.org" target="_blank" rel="noopener"><span class="tag">Northwest Indiana · Illinois</span><b>Chicagoland Mesh</b><small>The Chicago area, reaching into northwest Indiana.</small></a>
+    <a class="card" href="https://michmesh.com" target="_blank" rel="noopener"><span class="tag">Michigan</span><b>MichMesh</b><small>Michigan's statewide mesh community, across the northern line.</small></a>
+  </div>
+  <p class="note">Know a group that belongs here? <a href="https://github.com/mutiny19/ima/issues/new" target="_blank" rel="noopener">Open an issue</a> with its link.</p>
+</section>
+
+<section id="live" aria-labelledby="live-h">
+  <h2 id="live-h">Watch the mesh live</h2>
+  <p class="sub">Live traffic comes from <strong>observers</strong>: radios that upload what they hear to a shared service. Indiana's preferred observer service is Waev. These views open on their own sites.</p>
+  <div class="cards">
+    <a class="card here" href="https://waev.app/#/live-map/@39.85,-86.30,7.00z" target="_blank" rel="noopener"><span class="tag">Indiana · live map and packets</span><b>Waev</b><small>Live map, packets, and links between nodes, built from what observers actually hear. Opens centred on Indiana.</small></a>
+    <a class="card here" href="https://waev.app/#/connect" target="_blank" rel="noopener"><span class="tag">Run an observer · main Indiana feed</span><b>Connect an observer to Waev</b><small>Point your repeater or a spare radio at <code>mqtt.waev.app</code>. Setup for openHop, observer firmware, meshcoretomqtt, and Home Assistant is on this page.</small></a>
+    <a class="card" href="https://docs.okimesh.org/books/meshcore-I9o/page/mqtt-broker-settings" target="_blank" rel="noopener"><span class="tag">Run an observer · also suggested</span><b>OKI Mesh CoreScope</b><small>A second feed worth adding, especially in southern and eastern Indiana. Broker settings are on OKI's docs; the live view is <a href="https://map.okimesh.org" target="_blank" rel="noopener">map.okimesh.org</a>. Observers can feed several brokers at once.</small></a>
+    <a class="card" href="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" target="_blank" rel="noopener"><span class="tag">Where repeaters are</span><b>MeshCore Map</b><small>The official list of nodes their owners have registered. The same map is at the <a href="#map">top of this page</a>.</small></a>
+    <a class="card" href="https://ind.meshmapper.net" target="_blank" rel="noopener"><span class="tag">Indianapolis</span><b>MeshMapper Indianapolis</b><small>Repeaters, coverage from wardriving runs, and live traffic on a map.</small></a>
+    <a class="card" href="https://fwa.meshmapper.net" target="_blank" rel="noopener"><span class="tag">Fort Wayne</span><b>MeshMapper Fort Wayne</b><small>The same view for northeast Indiana.</small></a>
+    <a class="card" href="https://analyzer.letsmesh.net" target="_blank" rel="noopener"><span class="tag">Live packets</span><b>LetsMesh Packet Analyzer</b><small>Another shared observer network; packets as they arrive.</small></a>
+  </div>
+  <p class="note">The more observers in Indiana, the more of the state shows up live. Adding a repeater to the official map: <a class="out" href="https://docs.meshcore.io/faq/#512-q-how-do-i-add-a-node-to-the-meshcore-map" target="_blank" rel="noopener">MeshCore FAQ</a>. Questions about observers: ask on Discord.</p>
+</section>
+
+<section id="repeaters" aria-labelledby="rep-h">
+  <h2 id="rep-h">Running a repeater?</h2>
+  <p class="sub">Repeaters are where region settings matter. Use the reference for the area your repeater serves; each one is maintained by that group.</p>
+  <div class="cards">
+    <a class="card here" href="advanced/"><span class="tag">Indiana</span><b>Indiana region settings</b><small>The Indiana reference. Pick your counties on a map and it builds the exact repeater commands, starting from open defaults.</small></a>
+    <a class="card" href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener"><span class="tag">OKI Mesh</span><b>OKI region scopes</b><small>For repeaters serving the Cincinnati tri-state area, including southeast Indiana.</small></a>
+    <a class="card" href="https://neimesh.net" target="_blank" rel="noopener"><span class="tag">NEIMesh</span><b>Northeast Indiana</b><small>NEIMesh publishes its own region names for the Fort Wayne area.</small></a>
+    <a class="card" href="https://michmesh.com" target="_blank" rel="noopener"><span class="tag">MichMesh</span><b>Michigan regions</b><small>For repeaters near the Michigan line.</small></a>
+  </div>
+  <p class="note">How regions work, from the source: MeshCore's <a class="out" href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a> commands and the developer's post on <a class="out" href="https://blog.meshcore.io/2026/04/17/default-scope" target="_blank" rel="noopener">default scope</a>. Firmware and flashing: <a class="out" href="https://docs.meshcore.io/" target="_blank" rel="noopener">docs.meshcore.io</a>.</p>
+</section>
+
+<section id="more" aria-labelledby="more-h">
+  <h2 id="more-h">Other ways to go off-grid in Indiana</h2>
+  <p class="sub">All of these are in use around the state. Each project's own site is the place to learn it.</p>
+  <div class="cards">
+    <a class="card" href="https://meshtastic.org" target="_blank" rel="noopener"><b>Meshtastic</b><small>LoRa text mesh where every node can relay. No license. Start at meshtastic.org.</small></a>
+    <a class="card" href="https://www.fcc.gov/general-mobile-radio-service-gmrs" target="_blank" rel="noopener"><b>GMRS</b><small>Licensed UHF voice radio with repeaters. One family license, no exam. Rules and licensing at the FCC.</small></a>
+    <a class="card" href="https://www.arrl.org/getting-licensed" target="_blank" rel="noopener"><b>Ham radio</b><small>Licensed amateur radio, voice and data. Indiana clubs set local practice; getting licensed starts at the ARRL.</small></a>
+    <a class="card" href="https://reticulum.network" target="_blank" rel="noopener"><b>Reticulum</b><small>Encrypted networking over LoRa, Wi-Fi, packet radio, or the internet. Manual and software at reticulum.network.</small></a>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot"><div class="bar">
+  <span>Indiana Off-Grid Comms · from the <a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Indiana Mesh</a> community. Informational only. Not affiliated with the FCC, the ARRL, any protocol's developers, any repeater owner, or any group linked here.</span>
+  <span>Something out of date? <a href="https://github.com/mutiny19/ima/issues/new" target="_blank" rel="noopener">Open an issue</a> · <a href="https://github.com/mutiny19/ima" target="_blank" rel="noopener">Source on GitHub</a></span>
+</div></footer>
+
+<script>
+/* The USA preset values are read live from MeshCore's own preset list (the same one the app shows). If that fails, the page keeps the values above. */
+fetch("https://api.meshcore.nz/api/v1/config").then(function (r) { return r.json(); }).then(function (d) {
+  var e = (d.config && d.config.suggested_radio_settings && d.config.suggested_radio_settings.entries || []).filter(function (x) { return x.title === "USA"; })[0];
+  if (!e || !e.frequency) return;
+  document.getElementById("pn").textContent = e.title;
+  document.getElementById("pf").textContent = e.frequency + " MHz";
+  document.getElementById("pb").textContent = e.bandwidth + " kHz";
+  document.getElementById("ps").textContent = "SF" + e.spreading_factor;
+  document.getElementById("pc").textContent = "CR" + e.coding_rate;
+}).catch(function () {});
+</script>
+<script>
+(function () {
+  var b = document.getElementById("themeBtn"), root = document.documentElement;
+  function sync() { var dark = root.getAttribute("data-theme") !== "light", l = dark ? "Switch to light mode" : "Switch to dark mode"; b.setAttribute("aria-label", l); b.title = l; }
+  b.addEventListener("click", function () {
+    var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("ioc-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+</body>
+</html>

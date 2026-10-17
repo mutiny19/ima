@@ -1,0 +1,11 @@
+name: Suggest a change
+description: A broken or outdated link, a group that belongs on the page, or a correction.
+title: "<short description>"
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What should change?
+      description: A link to the official source is better than a copy of its content. Please don't include addresses or personal details.
+    validations:
+      required: true
