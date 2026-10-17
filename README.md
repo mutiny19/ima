@@ -9,16 +9,18 @@ protocol's official home.
 
 | Path | What |
 |---|---|
-| [`index.html`](index.html) | Home: statewide map (live NWS alerts, net schedule, live Kp), Indiana settings for each protocol, report form (opens a GitHub issue), support |
+| [`index.html`](index.html) | Home: statewide map (MeshCore repeaters from the nightly inventory, live NWS alerts, net schedule, live Kp), dashboard view, Indiana settings for each protocol, report form (opens a GitHub issue), support |
 | [`meshcore/`](meshcore/) | **Get on the Indiana mesh:** first radio to first message, nearby groups, repeater region setup |
 | [`advanced/`](advanced/) | **Indiana region settings** for MeshCore repeaters: pick counties on a map, get the commands |
 | [`live/`](live/) | Where to watch live MeshCore traffic: Waev (preferred), OKI CoreScope, LetsMesh, MeshMapper, the MeshCore Map |
 | [`assets/site.css`](assets/site.css) | Shared colors, fonts, header and footer |
+| [`data/meshcore-nodes.json`](data/meshcore-nodes.json) | Repeaters on the map, refreshed nightly by [`tools/update_nodes.py`](tools/update_nodes.py) ([workflow](.github/workflows/nodes.yml)) from the official MeshCore Map feed. Repeaters only; personal nodes are counted, never plotted |
+| [`data/in-counties.json`](data/in-counties.json) | Indiana county boundaries and population from the Census Bureau, refreshed yearly ([workflow](.github/workflows/reference.yml)); feeds the coverage view |
 | [`data/nets.json`](data/nets.json) | Net schedule that feeds the home page's Nets box (on air now, starting within the hour, next up) |
 | [`data/settings/`](data/settings/) | Indiana's suggested settings, as data |
 | [`tools/check_links.py`](tools/check_links.py) | Weekly link check ([workflow](.github/workflows/links.yml)); opens an issue if an outside link breaks |
 
-Nothing from the mesh providers is cached here. Repeater positions and live traffic are links to the official MeshCore Map and the observer services; weather, Kp and the MeshCore radio preset load live in the browser.
+Data sources: the official MeshCore Map feed (nightly, repeaters only), the Census Bureau (yearly), and, live in the browser, the National Weather Service, NOAA SWPC and MeshCore's radio preset list. Live traffic is a link to Waev. If the nightly job stops, the map's source badge says so.
 
 ## Run it locally
 

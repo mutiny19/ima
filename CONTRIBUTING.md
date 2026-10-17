@@ -21,5 +21,5 @@ Open an issue with one of the forms at [New issue](https://github.com/mutiny19/i
 - **Link, don't copy.** If an official source explains it (MeshCore docs, the FCC, ARRL, a group's own site), link there. Less for us to maintain, and everyone follows the same standard.
 - **Get people talking.** Pages put first contact first: radio, settings, first message, nearby people.
 - **Neutral.** Every group and protocol is described in its own terms. Nothing here compares, ranks or criticises another network.
-- **Privacy.** No personal names, individual callsigns, addresses or node locations in this repo, and nothing cached from the mesh providers. List repeater sites only with the host's permission.
+- **Privacy.** Never publish personal node locations; the nightly inventory keeps repeaters only. No addresses or individual callsigns in the pages. List repeater sites only with the host's permission.
 - **Nothing simulated ships.** Best-guess or simulated data stays out of the live pages until it's real.

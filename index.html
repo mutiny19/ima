@@ -5,7 +5,7 @@
 <script>/* Dark by default; a visitor's choice is remembered. Runs before paint to avoid a flash. */
 (function () { var t; try { t = localStorage.getItem("ioc-theme"); } catch (e) {} document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark"); })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Off-grid communications in Indiana on one map: live weather alerts, nets, propagation, and the settings to use for MeshCore, Meshtastic, GMRS, ham radio and Reticulum.">
+<meta name="description" content="Off-grid communications in Indiana on one map: MeshCore repeaters, live weather alerts, and the settings to use for MeshCore, Meshtastic, GMRS, ham radio and Reticulum.">
 <title>Indiana Off-Grid Comms</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -185,8 +185,7 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
 .support { padding-block: 64px 72px; display: grid; gap: 20px; }
 .support h2 { font-size: 32px; font-weight: 800; }
 .support .lead { color: var(--muted); max-width: 70ch; }
-.sup-grid { display: grid; gap: 16px; }
-.ways { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.sup-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; }
 .needs { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 10px; }
 .needs .h { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
 .needs .h b { font-weight: 800; font-size: 18px; }
@@ -236,21 +235,29 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
     <div class="band-top">
       <div id="hero">
         <h1>Off-grid Indiana, on one map</h1>
-        <p class="sub">Live weather alerts, nets and propagation. Then the settings to join in, below.</p>
-        <div class="onair"><b class="pill">MeshCore repeaters</b><a href="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" target="_blank" rel="noopener">Official MeshCore Map, centred on Indiana ↗</a><span>·</span><a href="https://waev.app/#/live-map/@39.85,-86.30,7.00z" target="_blank" rel="noopener">Live traffic on Waev ↗</a></div>
+        <p class="sub">MeshCore repeaters and live weather alerts. Then the settings to join in, below.</p>
+        <div class="onair"><b class="pill" id="pillCount">Indiana MeshCore repeaters</b><span id="pillSub">heard in the last 30 days</span><a href="https://docs.meshcore.io/faq/#512-q-how-do-i-add-a-node-to-the-meshcore-map" target="_blank" rel="noopener">Add your repeater to the MeshCore Map ↗</a><a href="https://waev.app/#/live-map/@39.85,-86.30,7.00z" target="_blank" rel="noopener">Live traffic on Waev ↗</a></div>
       </div>
+      <div id="dashHead" hidden>
+        <h1 style="font-size:30px">Statewide dashboard</h1>
+        <p class="sub mono" style="font-size:13px" id="clock">Updated live</p>
+      </div>
+      <button type="button" class="btn dash-btn" id="dashBtn" aria-pressed="false">⤢ Dashboard view</button>
     </div>
 
     <div class="layers" role="group" aria-label="Map layers">
+      <button type="button" class="layer" data-layer="meshcore" aria-pressed="true">✓ MeshCore repeaters</button>
       <button type="button" class="layer" data-layer="weather" aria-pressed="true">✓ Weather alerts</button>
       <button type="button" class="layer" data-layer="nets" aria-pressed="true">✓ Nets</button>
     </div>
 
+    <div class="tiles" id="tiles" hidden></div>
+
     <div class="mapgrid">
       <div class="mapbox">
-        <div class="srcbadge" id="srcbadge">ALERTS: NWS, LIVE · NETS: COMMUNITY SCHEDULE</div>
+        <div class="srcbadge" id="srcbadge">REPEATERS: MAP.MESHCORE.IO · ALERTS: NWS, LIVE</div>
         <svg id="mapsvg" viewBox="-245 -130 1150 1240" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="mapTitle">
-          <title id="mapTitle">Map of Indiana and neighbouring states showing active National Weather Service alerts and the selected net's repeater</title>
+          <title id="mapTitle">Map of Indiana and neighbouring states showing MeshCore repeaters and active National Weather Service alerts</title>
           <g fill="#0F1A16" stroke="#34433D" stroke-width="1.5" aria-hidden="true">
           <path d="M57 -170 L86 -85 L96 -35 L110 15 L109 602 L115 690 L96 770 L38 865 L10 965 L0 1065 L-60 1140 L-290 1140 L-290 -170 Z"/>
           <path d="M345 -170 L306 -85 L245 0 L630 0 L900 8 L940 8 L940 -170 Z"/>
@@ -270,6 +277,7 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
           </g>
           <text x="140" y="-120" fill="#3B6A85" font-family="IBM Plex Mono, monospace" font-size="14" font-style="italic">Lake Michigan</text>
           <g id="lyr-weather"></g>
+          <g id="lyr-meshcore"></g>
           <g fill="#DDE3E0" font-family="Archivo, sans-serif" font-size="15" font-weight="600">
           <text x="383" y="518">Indianapolis</text>
           <text x="580" y="200">Fort Wayne</text>
@@ -291,7 +299,7 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
         </svg>
         <div class="legend">
           <div><b>Legend</b></div>
-          <div><span style="color:#B197FC">▲</span> Net repeater (town-level) and rough reach · MeshCore repeaters are on the <a href="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" target="_blank" rel="noopener" style="color:#1F4D3A">MeshCore Map</a></div>
+          <div><span style="color:#E8590C">●</span> MeshCore repeater, heard in 30 days · <span style="color:#E8590C">○</span> quiet 30+ days · owner-registered on the <a href="https://map.meshcore.io" target="_blank" rel="noopener" style="color:#1F4D3A">MeshCore Map</a></div>
           <div><span style="color:#E03131">▭</span> Tornado · <span style="color:#E8590C">▭</span> Severe T-storm · <span style="color:#2F9E44">▭</span> Flood · <span style="color:#1C7ED6">▭</span> Winter · <span style="color:#C99A06">▭</span> Other</div>
           <div>Outlined: storm-based warning · soft fill: counties or zones under a watch or advisory</div>
         </div>
@@ -313,6 +321,22 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
       </aside>
     </div>
 
+    <div class="dashrow" id="dashRow" hidden>
+      <section class="dpanel" style="flex: 999 1 520px" aria-label="Live MeshCore traffic">
+        <div class="h"><b>Live traffic</b><span class="tag live">WAEV</span></div>
+        <p style="color:var(--map-muted)">Live packets and links between nodes come from observers feeding Waev, Indiana's preferred observer service. It opens centred on Indiana.</p>
+        <p><a href="https://waev.app/#/live-map/@39.85,-86.30,7.00z" target="_blank" rel="noopener">Open the Waev live map ↗</a> · <a href="https://waev.app/#/connect" target="_blank" rel="noopener">Run an observer ↗</a></p>
+      </section>
+      <section class="dpanel" style="flex: 1 1 320px" aria-label="Quietest Indiana repeaters">
+        <div class="h"><b>Repeaters gone quiet</b><span class="tag live" id="healthDate">MAP FEED</span></div>
+        <div class="health" id="health"></div>
+        <div class="note">Indiana repeaters with the oldest last advert, from the official map feed. Owners: a fresh advert clears it.</div>
+      </section>
+      <section class="dpanel" style="flex: 1 1 100%" aria-label="Interstate coverage">
+        <div class="h"><b>Interstate coverage in Indiana</b><span class="note"><span class="dot" style="background:#FFA8A8"></span>Needs a repeater · <span class="dot" style="background:#FFD43B"></span>Repeater quiet 30+ days · <span class="dot" style="background:#8CE99A"></span>Covered · <span id="covDate">MeshCore Map, nightly</span></span></div>
+        <div class="cov" id="cov"></div>
+      </section>
+    </div>
   </div>
 </section>
 
@@ -334,24 +358,45 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
   <div class="wrap">
     <div class="intro">
       <h2 id="rep-h">Report</h2>
-      <p>Add a net or event, suggest a protocol, or send a correction. Reports feed the net schedule and the settings pages.</p>
+      <p>Tell us what you run, what's happening, and what's broken. Reports feed the counts, the map and the event calendar.</p>
       <ul>
-        <li>Nets and events are reviewed before they appear</li>
-        <li>New protocols with enough users get their own entry</li>
+        <li>Counts are shown by county, never by address</li>
+        <li>Events and outages are reviewed before they appear</li>
         <li>No addresses or personal details, please</li>
+        <li>New protocols with enough users get their own entry</li>
       </ul>
       <p style="font-size:14px">Reports open as a prefilled GitHub issue, so they're reviewed in the open. You'll need a free GitHub account.</p>
     </div>
     <div class="formbox">
       <div class="tabs" role="tablist" aria-label="Report type">
-        <button type="button" role="tab" id="tab-event" aria-selected="true" aria-controls="f-event">Net or event</button>
+        <button type="button" role="tab" id="tab-use" aria-selected="true" aria-controls="f-use">I use…</button>
+        <button type="button" role="tab" id="tab-event" aria-selected="false" aria-controls="f-event">Event</button>
+        <button type="button" role="tab" id="tab-outage" aria-selected="false" aria-controls="f-outage">Outage</button>
         <button type="button" role="tab" id="tab-proto" aria-selected="false" aria-controls="f-proto">New protocol</button>
-        <button type="button" role="tab" id="tab-fix" aria-selected="false" aria-controls="f-fix">Correction</button>
       </div>
-      <form id="f-event" data-kind="event" role="tabpanel" aria-labelledby="tab-event">
+      <form id="f-use" data-kind="use" role="tabpanel" aria-labelledby="tab-use">
+        <fieldset>
+          <legend>What do you use? Pick all that apply.</legend>
+          <div class="checks">
+            <label><input type="checkbox" name="proto" value="GMRS"> GMRS</label>
+            <label><input type="checkbox" name="proto" value="Ham radio"> Ham radio</label>
+            <label><input type="checkbox" name="proto" value="MeshCore"> MeshCore</label>
+            <label><input type="checkbox" name="proto" value="Meshtastic"> Meshtastic</label>
+            <label><input type="checkbox" name="proto" value="Reticulum"> Reticulum</label>
+            <label><input type="checkbox" name="proto" value="Something else"> Something else</label>
+          </div>
+        </fieldset>
+        <div class="fields">
+          <label>County<select name="county" id="county" required><option value="">Choose a county</option></select></label>
+          <label>Your role<select name="role"><option>I use it</option><option>I run a repeater or fixed node</option><option>I organize a club or group</option></select></label>
+          <label>How many radios or nodes<input type="number" name="count" min="1" value="1"></label>
+        </div>
+        <div class="submit"><small>Your GitHub account keeps you from being counted twice. Don't post addresses.</small><button class="btn primary" type="submit">Count me in</button></div>
+      </form>
+      <form id="f-event" data-kind="event" role="tabpanel" aria-labelledby="tab-event" hidden>
         <label>Event name<input type="text" name="name" required></label>
         <div class="fields">
-          <label>Type<select name="type"><option>Net (recurring)</option><option>Net: fix or remove a listing</option><option>SKYWARN net (activated during severe weather)</option><option>Meetup</option><option>Build night</option><option>Hamfest</option><option>Field day or exercise</option></select></label>
+          <label>Type<select name="type"><option>Net (recurring)</option><option>SKYWARN net (activated during severe weather)</option><option>Meetup</option><option>Build night</option><option>Hamfest</option><option>Field day or exercise</option></select></label>
           <label>Date and time<input type="datetime-local" name="when"></label>
           <label>Repeats<select name="repeats"><option>One time</option><option>Weekly</option><option>Monthly</option></select></label>
           <label>Protocol<select name="protocol"><option>GMRS</option><option>Ham radio</option><option>MeshCore</option><option>Meshtastic</option><option>Reticulum</option><option>Mixed</option></select></label>
@@ -359,6 +404,16 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
         <label>Where (venue, or repeater for a net)<input type="text" name="where"></label>
         <label>Link (optional)<input type="url" name="link"></label>
         <div class="submit"><small>Reviewed before it shows on the map and calendar.</small><button class="btn primary" type="submit">Submit event</button></div>
+      </form>
+      <form id="f-outage" data-kind="outage" role="tabpanel" aria-labelledby="tab-outage" hidden>
+        <div class="fields">
+          <label>Repeater or node name<input type="text" name="name" placeholder="IN.CTY.name" required></label>
+          <label>Protocol<select name="protocol"><option>MeshCore</option><option>Meshtastic</option><option>GMRS repeater</option><option>Ham repeater</option><option>Reticulum node</option></select></label>
+          <label>Down since<input type="datetime-local" name="since"></label>
+          <label>Are you the owner?<select name="owner"><option>No, just noticed it</option><option>Yes, I run it</option></select></label>
+        </div>
+        <label>What are you seeing?<textarea rows="3" name="what"></textarea></label>
+        <div class="submit"><small>Shown as reported until the owner confirms.</small><button class="btn primary" type="submit">Report outage</button></div>
       </form>
       <form id="f-proto" data-kind="proto" role="tabpanel" aria-labelledby="tab-proto" hidden>
         <div class="fields">
@@ -368,12 +423,6 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
           <label>Would you maintain its settings?<select name="maintain"><option>Yes</option><option>Maybe</option><option>No</option></select></label>
         </div>
         <div class="submit"><small>Once a few people report using it, it gets a settings entry.</small><button class="btn primary" type="submit">Suggest protocol</button></div>
-      </form>
-      <form id="f-fix" data-kind="fix" role="tabpanel" aria-labelledby="tab-fix" hidden>
-        <label>What's wrong or out of date?<textarea rows="4" name="what" required></textarea></label>
-        <label>Where (page or section)<input type="text" name="where"></label>
-        <label>Link to the correct source (optional)<input type="url" name="link"></label>
-        <div class="submit"><small>A link to the official source beats a copy of its content.</small><button class="btn primary" type="submit">Send correction</button></div>
       </form>
       <div class="thanks" id="thanks" hidden>
         <b>Almost done</b>
@@ -389,9 +438,14 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
   <h2 id="sup-h">Keep Indiana on the air</h2>
   <p class="lead">Indiana Mesh lives on <a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Discord</a>. The most useful help is a high site, a repeater, or your time.</p>
   <div class="sup-grid">
+    <div class="needs">
+      <div class="h"><b>Where Indiana needs repeaters next</b><span id="needsDate">people per active repeater</span></div>
+      <div id="needs" class="needs-list"><div class="county"><b>Loading…</b></div></div>
+      <p style="font-size:13px;color:var(--muted)">Ranked by people per active repeater (heard in the last 30 days). Repeaters from the official MeshCore Map; population from the Census Bureau. Updated nightly.</p>
+    </div>
     <div class="ways">
       <div class="way"><h3>Host a site</h3><p>A roof, tower or grain leg. One good site can cover several counties.</p><a class="btn primary" href="https://github.com/mutiny19/ima/issues/new?template=listing.yml" target="_blank" rel="noopener">Offer a site</a></div>
-      <div class="way"><h3>Put up a repeater</h3><p>Start with the settings above and the Indiana region settings, then register it on the MeshCore Map.</p><a class="btn primary" href="advanced/">Indiana region settings</a></div>
+      <div class="way"><h3>Put up a repeater</h3><p>Start with the settings above and the Indiana region settings, then list it on the MeshCore Map so it shows here.</p><a class="btn primary" href="advanced/">Indiana region settings</a></div>
       <div class="way alt"><h3>Run an observer</h3><p>A radio that uploads what it hears puts your area on the live maps. Indiana's preferred service is Waev.</p><a class="btn primary" href="https://waev.app/#/connect" target="_blank" rel="noopener">Connect an observer ↗</a></div>
     </div>
   </div>
@@ -418,7 +472,36 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
     if (d < 60) return Math.round(d) + " d";
     return Math.round(d / 30) + " mo";
   };
-  var netsOnAir = null, netsSoon = null;
+  var stats = {}, alertCount = null, kpNow = null, netsOnAir = null, netsSoon = null;
+
+  /* ---------- MeshCore repeaters (nightly inventory) ---------- */
+  fetch("data/meshcore-nodes.json", { cache: "no-cache" }).then(function (r) { return r.json(); }).then(function (d) {
+    stats = d.stats || {};
+    var g = $("lyr-meshcore"), quiet = el("g", { fill: "none", stroke: "#E8590C", "stroke-opacity": "0.55", "stroke-width": "1.5" }, g),
+        live = el("g", { fill: "#E8590C", stroke: "#0C1512", "stroke-width": "1.5" }, g);
+    d.repeaters.forEach(function (r) {
+      var xy = P(r.lat, r.lon), fresh = (Date.now() - Date.parse(r.seen)) < 30 * 86400000;
+      var c = el("circle", { cx: xy[0].toFixed(1), cy: xy[1].toFixed(1), r: fresh ? 4 : 3.5 }, fresh ? live : quiet);
+      el("title", {}, c).textContent = r.name + " · last advert " + ago(r.seen) + " ago";
+    });
+    var date = d.generated.slice(0, 10);
+    $("pillCount").textContent = stats.in_repeaters_30d + " Indiana MeshCore repeaters";
+    $("pillSub").textContent = "heard in the last 30 days · map feed " + date;
+    var stale = Date.now() - Date.parse(d.generated) > 3 * 86400000;   // the nightly job should never be this far behind
+    $("srcbadge").textContent = "REPEATERS: MAP.MESHCORE.IO, " + date + (stale ? " (STALE: NIGHTLY UPDATE HAS STOPPED)" : "") + " · ALERTS: NWS, LIVE";
+    if (stale) { $("srcbadge").style.background = "#FFA8A8"; $("srcbadge").innerHTML += ' · <a href="https://github.com/mutiny19/ima/actions" target="_blank" rel="noopener" style="color:#13201C">check the nightly job</a>'; }
+    $("healthDate").textContent = "MAP FEED " + date;
+    var quietest = d.repeaters.filter(function (r) { return r.in; }).sort(function (a, b) { return a.seen < b.seen ? -1 : 1; }).slice(0, 6);
+    $("health").innerHTML = quietest.map(function (r) {
+      var days = (Date.now() - Date.parse(r.seen)) / 86400000, c = days < 2 ? "#40C057" : days < 30 ? "#FAB005" : "#FA5252";
+      return '<div><span><span class="dot" style="background:' + c + '"></span>' + esc(r.name || "(no name)") + "</span><span>seen " + ago(r.seen) + " ago</span></div>";
+    }).join("");
+    renderCoverage(d);
+    renderTiles();
+  }).catch(function () {
+    $("pillCount").textContent = "Indiana MeshCore repeaters";
+    $("pillSub").textContent = "map data unavailable right now";
+  });
 
   /* ---------- NWS alerts, live (map: Indiana + neighbours; list: Indiana) ---------- */
   var ALERTS_URL = "https://api.weather.gov/alerts/active?area=IN,IL,OH,KY,MI";
@@ -472,6 +555,7 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
     });
   }
   function renderAlertList(feats) {
+    alertCount = feats.length;
     var box = $("alerts");
     if (!feats.length) box.innerHTML = '<div class="empty">No active National Weather Service alerts for Indiana right now.</div>';
     else {
@@ -486,6 +570,7 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
       }).join("") + (feats.length > 6 ? '<div class="empty">' + (feats.length - 6) + ' more at <a href="https://www.weather.gov/" target="_blank" rel="noopener">weather.gov</a></div>' : "");
     }
     $("alertsTime").textContent = "Checked " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) + " · refreshes every 3 min";
+    renderTiles();
   }
   loadAlerts();
   setInterval(loadAlerts, 3 * 60 * 1000);
@@ -497,7 +582,8 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
       kpNow = kp;
       var word = kp >= 7 ? "strong storm" : kp >= 5 ? "storm" : kp >= 4 ? "active" : "quiet";
       $("kp").textContent = "Kp " + kp.toFixed(1) + " · " + word;
-      }).catch(function () { $("kp").textContent = "unavailable"; });
+      renderTiles();
+    }).catch(function () { $("kp").textContent = "unavailable"; });
   }
   loadKp();
   setInterval(loadKp, 15 * 60 * 1000);
@@ -559,8 +645,34 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
     netShown = {}; shown.forEach(function (o) { netShown[o.net.name + "|" + o.start.toISOString()] = o; });
     if (netSel && !netShown[netSel]) { netSel = null; drawNet(null); }   // its slot ended: clear the circle
     var a = live.length, b = next.filter(function (o) { return o.start - now <= 3600000; }).length;
-    netsOnAir = a; netsSoon = b;
+    if (a !== netsOnAir || b !== netsSoon) { netsOnAir = a; netsSoon = b; renderTiles(); }
   }
+
+  /* ---------- dashboard ---------- */
+  function renderTiles() {
+    var T = [
+      ["Indiana repeaters, heard 30 d", stats.in_repeaters_30d, "of " + (stats.in_repeaters || "?") + " on the map", "#F1F3F1"],
+      ["Neighbor-state repeaters", stats.neighbor_repeaters_30d, "heard in 30 days, on this map", "#F1F3F1"],
+      ["Indiana companions, 30 d", stats.in_companions_30d, "count only, never plotted", "#F1F3F1"],
+      ["Active NWS alerts", alertCount, "Indiana, live", alertCount ? "#FFA94D" : "#F1F3F1"],
+      ["Nets on air", netsOnAir, "plus starting within 1 h: " + (netsSoon == null ? "…" : netsSoon), netsOnAir ? "#FF6B6B" : "#F1F3F1"],
+      ["Planetary Kp", kpNow == null ? null : kpNow.toFixed(1), "aurora and HF conditions", "#66D9E8"]
+    ];
+    $("tiles").innerHTML = T.map(function (t) {
+      return '<div class="tile"><div class="k">' + t[0] + '</div><div class="v" style="color:' + t[3] + '">' + (t[1] == null ? "…" : esc(t[1])) + '</div><div class="s">' + t[2] + "</div></div>";
+    }).join("");
+  }
+  var band = $("map"), dashOn = false, clockTimer = null;
+  $("dashBtn").addEventListener("click", function () {
+    dashOn = !dashOn;
+    band.classList.toggle("dash", dashOn);
+    this.setAttribute("aria-pressed", String(dashOn));
+    this.textContent = dashOn ? "⤡ Exit dashboard" : "⤢ Dashboard view";
+    $("hero").hidden = dashOn; $("dashHead").hidden = !dashOn; $("tiles").hidden = !dashOn; $("dashRow").hidden = !dashOn;
+    document.getElementById("protocols").parentElement.hidden = dashOn;
+    if (dashOn) { tick(); clockTimer = setInterval(tick, 1000); } else clearInterval(clockTimer);
+  });
+  function tick() { $("clock").textContent = "Updated live · " + new Date().toLocaleTimeString(); }
 
   /* ---------- layers ---------- */
   document.querySelectorAll(".layer[data-layer]").forEach(function (b) {
@@ -571,6 +683,29 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
       $("lyr-" + id).style.display = on ? "" : "none";
     });
   });
+
+  /* ---------- interstate coverage + where repeaters are needed: nightly from the MeshCore Map and Census data ---------- */
+  var ROADS = [["I-64", ["Posey", "Vanderburgh", "Gibson", "Warrick", "Spencer", "Dubois", "Perry", "Crawford", "Harrison", "Floyd"]], ["I-65", ["Lake", "Jasper", "Newton", "White", "Tippecanoe", "Clinton", "Boone", "Marion", "Hendricks", "Shelby", "Johnson", "Bartholomew", "Jackson", "Scott", "Clark"]], ["I-69", ["Steuben", "DeKalb", "Allen", "Huntington", "Wells", "Grant", "Delaware", "Madison", "Hamilton", "Marion", "Monroe", "Greene", "Daviess", "Pike", "Gibson", "Warrick", "Vanderburgh"]], ["I-70", ["Vigo", "Clay", "Putnam", "Hendricks", "Morgan", "Marion", "Hancock", "Henry", "Wayne"]], ["I-74", ["Vermillion", "Fountain", "Montgomery", "Hendricks", "Boone", "Marion", "Shelby", "Decatur", "Rush", "Ripley", "Franklin", "Dearborn"]], ["I-80/90", ["Lake", "Porter", "LaPorte", "St. Joseph", "Elkhart", "LaGrange", "Steuben"]], ["I-94", ["Lake", "Porter", "LaPorte"]]];   // Indiana counties each interstate passes through (geography)
+  function renderCoverage(d) {
+    var C = d.counties || {}, cls = function (c) { var v = C[c]; return !v || !v[0] ? ["c-need", "needs a repeater"] : v[1] ? ["c-ok", "covered"] : ["c-quiet", "repeater quiet 30+ days"]; };
+    $("cov").innerHTML = ROADS.map(function (r) {
+      return '<div class="road"><span>' + r[0] + '</span><div class="cty">' + r[1].map(function (c) {
+        var k = cls(c), v = C[c] || [0, 0];
+        return '<span class="' + k[0] + '" title="' + c + ": " + k[1] + " (" + v[0] + " repeaters, " + v[1] + ' heard in 30 days)">' + c + "</span>";
+      }).join("") + "</div></div>";
+    }).join("");
+    var roadsOf = {};
+    ROADS.forEach(function (r) { r[1].forEach(function (c) { (roadsOf[c] = roadsOf[c] || []).push(r[0]); }); });
+    var rank = Object.keys(C).filter(function (k) { return C[k][2]; }).sort(function (a, b) {
+      return C[b][2] / Math.max(C[b][1], 0.5) - C[a][2] / Math.max(C[a][1], 0.5);
+    }).slice(0, 5);
+    $("needs").innerHTML = rank.map(function (k) {
+      var v = C[k];
+      return '<div class="county"><b>' + esc(k) + '</b><span class="w">' + (roadsOf[k] ? roadsOf[k].join(", ") : "No interstate") + '</span><span class="p">' +
+        v[2].toLocaleString() + " people<em>" + v[0] + " repeater" + (v[0] === 1 ? "" : "s") + ", " + v[1] + " active</em></span></div>";
+    }).join("");
+    $("covDate").textContent = $("needsDate").textContent = "MeshCore Map " + d.generated.slice(0, 10) + " · Census population";
+  }
 
   /* ---------- settings accordion ---------- */
   var PROTOS = [
@@ -702,7 +837,9 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
   renderAcc();
 
   /* ---------- report: tabs + prefilled GitHub issue ---------- */
-  var tabs = ["event", "proto", "fix"];
+  var COUNTIES = ["Adams", "Allen", "Bartholomew", "Benton", "Blackford", "Boone", "Brown", "Carroll", "Cass", "Clark", "Clay", "Clinton", "Crawford", "Daviess", "Dearborn", "Decatur", "DeKalb", "Delaware", "Dubois", "Elkhart", "Fayette", "Floyd", "Fountain", "Franklin", "Fulton", "Gibson", "Grant", "Greene", "Hamilton", "Hancock", "Harrison", "Hendricks", "Henry", "Howard", "Huntington", "Jackson", "Jasper", "Jay", "Jefferson", "Jennings", "Johnson", "Knox", "Kosciusko", "LaGrange", "Lake", "LaPorte", "Lawrence", "Madison", "Marion", "Marshall", "Martin", "Miami", "Monroe", "Montgomery", "Morgan", "Newton", "Noble", "Ohio", "Orange", "Owen", "Parke", "Perry", "Pike", "Porter", "Posey", "Pulaski", "Putnam", "Randolph", "Ripley", "Rush", "St. Joseph", "Scott", "Shelby", "Spencer", "Starke", "Steuben", "Sullivan", "Switzerland", "Tippecanoe", "Tipton", "Union", "Vanderburgh", "Vermillion", "Vigo", "Wabash", "Warren", "Warrick", "Washington", "Wayne", "Wells", "White", "Whitley"];
+  $("county").insertAdjacentHTML("beforeend", COUNTIES.map(function (c) { return "<option>" + c + "</option>"; }).join(""));
+  var tabs = ["use", "event", "outage", "proto"];
   function pick(id) {
     tabs.forEach(function (t) {
       $("tab-" + t).setAttribute("aria-selected", String(t === id));
@@ -712,14 +849,21 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
   }
   tabs.forEach(function (t) { $("tab-" + t).addEventListener("click", function () { pick(t); }); });
   document.querySelectorAll("a[data-tab]").forEach(function (a) { a.addEventListener("click", function () { pick(a.dataset.tab); }); });
-  var TITLES = { event: "[event] ", proto: "[protocol] ", fix: "[correction] " };
-  var LABELS = { event: "event", proto: "protocol", fix: "correction" };
+  var TITLES = { use: "[count] ", event: "[event] ", outage: "[outage] ", proto: "[protocol] " };
+  var LABELS = { use: "count", event: "event", outage: "outage", proto: "protocol" };
   document.querySelectorAll("form[data-kind]").forEach(function (f) {
     f.addEventListener("submit", function (e) {
       e.preventDefault();
       var kind = f.dataset.kind, fd = new FormData(f), lines = [], title;
-      title = TITLES[kind] + (fd.get("name") || fd.get("where") || "");
-      fd.forEach(function (v, k) { if (v) lines.push("**" + k + ":** " + v); });
+      if (kind === "use") {
+        var protos = fd.getAll("proto");
+        if (!protos.length) { alertBox(f, "Pick at least one."); return; }
+        title = TITLES.use + protos.join(", ") + " in " + fd.get("county") + " County";
+        lines.push("**Uses:** " + protos.join(", "), "**County:** " + fd.get("county"), "**Role:** " + fd.get("role"), "**Radios or nodes:** " + fd.get("count"));
+      } else {
+        title = TITLES[kind] + (fd.get("name") || "");
+        fd.forEach(function (v, k) { if (v) lines.push("**" + k + ":** " + v); });
+      }
       lines.push("", "_Sent from the Indiana Off-Grid Comms report form._");
       var url = "https://github.com/mutiny19/ima/issues/new?labels=" + encodeURIComponent("report," + LABELS[kind]) +
         "&title=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(lines.join("\n"));
@@ -728,6 +872,9 @@ input[type="text"], input[type="number"], input[type="url"], input[type="datetim
       f.hidden = true; $("thanks").hidden = false;
     });
   });
+  function alertBox(f, msg) {
+    var s = f.querySelector(".submit small"); s.textContent = msg; s.style.color = "var(--signal)";
+  }
   $("again").addEventListener("click", function () {
     var cur = tabs.filter(function (t) { return $("tab-" + t).getAttribute("aria-selected") === "true"; })[0];
     document.querySelectorAll("form[data-kind]").forEach(function (f) { f.reset(); });
