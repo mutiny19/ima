@@ -61,3 +61,16 @@ code { font-family: var(--mono); font-size: .9em; }
 .site-notice { background: var(--signal-soft); color: var(--fg); border-bottom: 1px solid var(--line); }
 .site-notice .bar { max-width: 1200px; margin: 0 auto; padding: 9px 24px; font-size: 13.5px; line-height: 1.45; }
 .site-notice b { color: var(--signal); font-weight: 700; }
+
+/* Every link that leaves the site carries the same marker; buttons and cards draw their own. */
+a[href^="http"]:where(:not(.btn, .card, .brand, .cta, .go, .layer, .links a, .site-nav a, .way a, .view a))::after { content: " \2197"; font-size: .85em; }
+
+/* Phones: secondary nav links behind a Menu button; Map, Join and Get on the mesh stay visible. */
+.nav-menu { display: none; font: 600 15px/1 var(--body); border: 2px solid #4D5E57; background: transparent; color: var(--ink-fg); border-radius: 6px; padding: 9px 14px; min-height: 40px; cursor: pointer; }
+.nav-menu[aria-expanded="true"] { border-color: var(--beacon); }
+.nav-more { display: contents; }
+@media (max-width: 860px) {
+  .nav-menu { display: inline-flex; }
+  .nav-more { display: none; width: 100%; flex-wrap: wrap; gap: 14px 18px; padding: 6px 0 2px; }
+  .nav-more.open { display: flex; }
+}
