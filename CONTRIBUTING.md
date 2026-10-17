@@ -2,18 +2,24 @@
 
 Thanks for helping Indiana get on the air.
 
-The quickest way is to [open an issue](https://github.com/mutiny19/ima/issues/new/choose): a broken or outdated link, a group that belongs on the page, or a correction. Pull requests are welcome too.
+## The quickest way
 
-## What the site is for
+Open an issue with one of the forms at [New issue](https://github.com/mutiny19/ima/issues/new/choose):
 
-- **A signpost, not an authority.** If an official source covers a topic (the MeshCore docs, the FCC, a group's own site), link there instead of copying it. The site should need almost no upkeep.
-- **Welcoming at every level.** Anything that would overwhelm a first-time reader gets a short line and a link to the source, not a wall of detail.
-- **Neutral.** Every mesh group and protocol is described in its own terms. Nothing here compares, ranks, or criticises another network.
-- **Privacy.** No names, callsigns, addresses, or personal node locations in this repo. The map is the official MeshCore Map, embedded live, so nothing is copied here.
-- **One exception:** `advanced/` is the Indiana reference for repeater region settings and is maintained here.
+- **Settings change:** a proposed change to Indiana's suggested settings
+- **Add a listing:** a repeater you own or host, or a local group
+- **Something else:** guides, tools, corrections
 
 ## Pull requests
 
-1. Fork, branch, and make your change.
-2. Keep outside links to official or group-maintained pages.
+1. Fork, branch, and add your change.
+2. Settings live in [`data/settings/`](data/settings/) as JSON. A person approves every settings change.
 3. Run `python3 tools/check_links.py` if you added or changed links.
+
+## Principles
+
+- **Link, don't copy.** If an official source explains it (MeshCore docs, the FCC, ARRL, a group's own site), link there. Less for us to maintain, and everyone follows the same standard.
+- **Get people talking.** Pages put first contact first: radio, settings, first message, nearby people.
+- **Neutral.** Every group and protocol is described in its own terms. Nothing here compares, ranks or criticises another network.
+- **Privacy.** No personal names, individual callsigns, addresses or node locations in this repo, and nothing cached from the mesh providers. List repeater sites only with the host's permission.
+- **Nothing simulated ships.** Best-guess or simulated data stays out of the live pages until it's real.
