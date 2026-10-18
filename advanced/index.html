@@ -78,7 +78,6 @@
 .abbr .chip[aria-pressed="true"] small { color: #13201C; }
 .abbr .chip.conv { border-style: dashed; }
 .abbr .abbr-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.abbr .open-box { display: grid; gap: 12px; padding: 14px 16px; border: 2px solid var(--beacon); border-radius: 12px; background: var(--signal-soft, var(--bg)); max-width: 74ch; }
 .abbr .chip.all { font-family: var(--body); font-weight: 700; }
 .abbr .note { font-size: 13px; color: var(--muted); }
 .abbr .alert { padding: 12px 14px; border-radius: 10px; border: 2px solid #c9a227; background: rgba(201, 162, 39, .12); font-size: 14px; line-height: 1.45; }
@@ -263,16 +262,6 @@
     <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
     <section class="panel step" aria-labelledby="step1-h">
       <h3 id="step1-h"><span class="stepnum">1</span> Where is it?</h3>
-      <div class="open-box">
-        <div>
-          <strong>Preferred: allow all Indiana region-scoped traffic.</strong> The repeater carries every metro code and every region in the state, so a message scoped to any Indiana region or metro passes through it. The safe default, and what backbone and high sites should run: 24 tags and about 151 of the 172 Discover Regions bytes, so there is room for two or three neighbour tags from step 2 near a border; the counter under the code will say when you are over.
-        </div>
-        <div class="abbr-actions">
-          <button type="button" class="chip all" id="abbrAll" aria-pressed="false">Allow all Indiana regions</button>
-          <button type="button" class="chip" id="abbrClear">Clear</button>
-        </div>
-      </div>
-      <p class="sub"><strong>Or scope it narrower:</strong> pick only the metro or region the repeater serves.</p>
       <div class="step1-grid">
         <div>
           <p class="sub">Two kinds of button on the map: <strong>click any county</strong> to add its region (tinted and numbered as on the Visit Indiana map), and <strong>click an airport-code pill</strong> to add that metro (shaded counties). Click again to remove. Pick one, or both.</p>
@@ -282,6 +271,7 @@
           <h4>Metro areas</h4>
           <p class="sub">Usually one. Two if you sit between them. None is fine for a rural repeater: it still carries <code>us</code> and <code>us-in</code>.</p>
           <div class="chips" id="abbrMetros"></div>
+          <div class="abbr-actions"><button type="button" class="chip" id="abbrClear">Clear all</button></div>
           <p class="note"><code>cvg</code> and <code>sdf</code> are the OKI-published codes for the Indiana counties in the Cincinnati and Louisville metros.</p>
           <h4>Regions</h4>
           <p class="sub">If no metro fits, the region. The eleven regions of the state's own <a href="https://visitindiana.in.gov/regions/" target="_blank" rel="noopener">Visit Indiana map</a>, the names most Hoosiers already use: <code>us-in-</code> plus the region's short code. No group publishes these yet; pick a region, a metro, or both.</p>
@@ -1117,15 +1107,9 @@ render();
         if (!n) return; var t = document.createElementNS(NS, "text"); t.setAttribute("x", (xs / n).toFixed(1)); t.setAttribute("y", (ys / n - 30).toFixed(1)); t.setAttribute("class", "dlbl"); t.textContent = d.code; svg.appendChild(t);
       });
     } Object.keys(mapEls).forEach(function (code) { mapEls[code].forEach(function (p) { p.classList.toggle("on", !!sel[code]); }); if (lblEls[code]) { lblEls[code].classList.toggle("on", !!sel[code]); lblEls[code].setAttribute("aria-pressed", String(!!sel[code])); } }); }
-  $("abbrAll").addEventListener("click", function () {
-    var all = METROS.concat(DIST).every(function (m) { return sel[m.code]; });
-    METROS.concat(DIST).forEach(function (m) { sel[m.code] = !all; });
-    syncChips(); renderAbbr();
-  });
   $("abbrClear").addEventListener("click", function () { sel = {}; syncChips(); renderAbbr(); });
   function syncChips() {
-    var all = METROS.concat(DIST).every(function (m) { return sel[m.code]; });
-    $("abbrAll").setAttribute("aria-pressed", String(all)); document.querySelectorAll("#abbrDistricts .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); document.querySelectorAll("#abbrMetros .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); }
+    document.querySelectorAll("#abbrDistricts .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); document.querySelectorAll("#abbrMetros .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); }
   function chip(def, host) {
     var b = document.createElement("button"); b.type = "button"; b.className = "chip" + (def.pub === false || (!def.pub && (host === "abbrMetros" || host === "abbrDistricts")) ? " conv" : "");
     b.setAttribute("aria-pressed", "false"); b.dataset.code = def.code;
