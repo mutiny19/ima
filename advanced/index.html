@@ -33,6 +33,36 @@
   --ok:#6cc58a; --warn:#e3a640; --crit:#ff8a80;
   --d1:#22312c;--d2:#2b2d22;--d3:#252a36;--d4:#302824;--d5:#1f3135;--d6:#2e2732;--d7:#263222;--d8:#332c1f;--d9:#232c34;--d10:#312a26; }
 .sb-head { display: grid; gap: 10px; }
+.mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 22px 0 18px; }
+.mode-btn { font: 700 15px/1 var(--body); border: 2px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 8px; padding: 12px 18px; min-height: 44px; cursor: pointer; }
+.mode-btn[aria-pressed="true"] { background: var(--beacon); border-color: var(--beacon); color: #13201C; }
+.mode-help { flex: 1 1 320px; font-size: 14px; color: var(--muted); max-width: 70ch; }
+.abbr { display: grid; gap: 16px; margin-bottom: 36px; }
+.abbr h2 { font-size: 26px; font-weight: 800; }
+.abbr .sub { color: var(--muted); max-width: 74ch; }
+.abbr-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.abbr .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
+.abbr .panel h3 { font-size: 18px; font-weight: 700; margin: 0; }
+.abbr .panel .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.abbr .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.abbr .chip { font: 500 14px/1 var(--mono); border: 2px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 10px 14px; min-height: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.abbr .chip small { font: 400 12px/1 var(--body); color: var(--muted); }
+.abbr .chip[aria-pressed="true"] { background: var(--beacon); border-color: var(--beacon); color: #13201C; }
+.abbr .chip[aria-pressed="true"] small { color: #13201C; }
+.abbr .chip.conv { border-style: dashed; }
+.abbr .note { font-size: 13px; color: var(--muted); }
+.abbr .pub, .abbr .conv { font: 600 11px/1 var(--mono); border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; }
+.abbr .conv { border-style: dashed; }
+.abbr pre { margin: 0; background: var(--code-bg); color: var(--code-fg); border-radius: 8px; padding: 12px 14px; font: 500 14px/1.6 var(--mono); overflow-x: auto; white-space: pre; }
+.abbr .copy { font: 600 13px/1 var(--body); border: 1px solid var(--line); background: var(--bg); color: var(--link); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+.abbr select { font: 400 15px/1.3 var(--body); padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.abbr .k { font-weight: 600; font-size: 14px; }
+.abbr .depth { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; }
+.abbr .depth summary { cursor: pointer; font-weight: 700; }
+.abbr .depth-list { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.abbr .depth-list strong { display: block; }
+.abbr .depth-list span { color: var(--muted); font-size: 14px; }
+@media (max-width: 760px) { .abbr-grid { grid-template-columns: 1fr; } }
 .sb-head h1 { font-size: clamp(2.2rem, 5.5vw, 3.4rem); font-weight: 800; }
 .sb-head .lead { font-size: 1.05rem; max-width: 74ch; }
 .sb-head .eyebrow { font: 600 .78rem/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--signal); }
@@ -176,6 +206,51 @@
     <p class="lead">The Indiana reference for repeater region tags. <strong>Phase 1</strong> is the starting set every Indiana repeater carries: <code>us</code> <code>us-in</code> <code>us-oh</code> <code>us-ky</code> <code>us-mi</code> <code>us-il</code>, with unscoped traffic allowed and no default region, so everything stays open. This page starts from Phase 1 and builds the commands as you add district, county, or neighbouring groups' tags. Adding tags only lets more scoped traffic through. Companion users need none of this. Neighbouring groups publish their own plans: <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>.</p>
     <p class="sub">Click the county your repeater sits in, then every county it reaches. Everything is optional: with nothing selected the output is exactly Phase 1.</p>
   </header>
+  <div class="mode" role="group" aria-label="Choose a scoping style">
+    <button type="button" class="mode-btn" id="modeAbbr" aria-pressed="true">Abbreviated</button>
+    <button type="button" class="mode-btn" id="modeFull" aria-pressed="false">County &amp; district</button>
+    <span class="mode-help">Two ways to tag a repeater. <strong>Abbreviated</strong> uses only tags other groups already carry; you could guess them from the convention. <strong>County &amp; district</strong> is the full builder, with Indiana's own county and district tags.</span>
+  </div>
+
+  <section id="abbr" class="abbr" aria-labelledby="abbr-h">
+    <h2 id="abbr-h">Abbreviated scoping</h2>
+    <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
+    <div class="abbr-grid">
+      <div class="panel">
+        <h3>Metro areas this repeater serves</h3>
+        <p class="sub">Usually one. Two if you sit between them. None is fine for a rural repeater: it still carries <code>us</code> and <code>us-in</code>.</p>
+        <div class="chips" id="abbrMetros"></div>
+        <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them yet; using one is a proposal, and it only matters once a second repeater carries it.</p>
+        <h3>Near a border?</h3>
+        <p class="sub">Add a neighbouring group's own tags, spelled exactly as they publish them. Each one only lets more scoped traffic through.</p>
+        <div class="chips" id="abbrNeighbors"></div>
+      </div>
+      <div class="panel">
+        <div class="head"><h3>Repeater commands</h3><button class="copy" type="button" id="abbrCopy">Copy</button></div>
+        <label class="k" for="abbrFw">Firmware</label>
+        <select id="abbrFw">
+          <option value="1.16">1.16 or newer (region def)</option>
+          <option value="1.15">1.15 or openHop (region put)</option>
+          <option value="1.14">1.14 and older (region put + allowf)</option>
+        </select>
+        <pre id="abbrOut"></pre>
+        <p class="note" id="abbrBudget"></p>
+        <p class="note">Run them on the repeater over USB serial or the app's remote admin, then <code>region list allowed</code> should show <code>*</code> plus every tag. Companions need nothing. Reference: MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>; neighbours' lists: <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>.</p>
+      </div>
+    </div>
+    <details class="depth">
+      <summary>Why these tags and not a hierarchy</summary>
+      <ul class="depth-list">
+        <li><strong>Tags match by exact string.</strong><span><code>us-in</code> does not imply <code>us</code>, and a nested tree is display only, so a hierarchy buys nothing on the air. What matters is that neighbours carry the identical string.</span></li>
+        <li><strong>Invented strings split the mesh.</strong><span>A scoped message is dropped by the first repeater on its path that lacks the exact tag. Codes already published by neighbours and observer services are the ones most likely to be on that path.</span></li>
+        <li><strong>Budget.</strong><span>A repeater holds 32 tags and answers Discover Regions in 172 bytes. Three short tags leave room for whatever comes next.</span></li>
+        <li><strong>Scope limits what you send, never what you hear.</strong><span>Most people never scope. For local chat a channel like <code>#hamilton</code> or <code>#eastcentral</code> crosses every repeater with nothing to configure.</span></li>
+        <li><strong>Why not "central" or "east central" tags.</strong><span>Those names have no agreed county boundaries and no neighbour carries them, so two people following the convention would still pick differently. The ten IDHS districts in the County &amp; district mode are the defined version; the metro codes already cover the same ground.</span></li>
+      </ul>
+    </details>
+  </section>
+
+  <div id="fullBuilder" hidden>
 
   <div class="grid">
     <section class="panel" aria-labelledby="map-h">
@@ -320,6 +395,7 @@
   <footer class="sb-foot">
     Districts follow the <a href="https://www.in.gov/dhs/files/IDHS-Districts-Map.pdf" target="_blank" rel="noopener">IDHS District Map</a>. The district and county codes are Indiana's reference set, maintained on this page; to propose a change, <a href="https://github.com/mutiny19/ima/issues/new" target="_blank" rel="noopener">open an issue</a>. OKI metro membership is approximated from metro statistical areas; OKI Mesh's own maps govern. Commands are checked against a copy of MeshCore's <code>region def</code> and <code>region put</code> parsing before display, and the limits (32 regions, a 172-byte Discover Regions reply) come from the firmware source. Out-of-state counties add only their state tag and, with OKI metros added, their metro tag. Command reference: <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.
   </footer>
+  </div>
 </main>
 
 <footer class="site-foot"><div class="bar">
@@ -815,6 +891,71 @@ function renderCompanion(plan, o){
   lastComp = steps.map((s,i) => `${i+1}. ` + s.replace(/<[^>]+>/g,"")).join("\n");
 }
 render();
+</script>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var METROS = [
+    { code: "ind", name: "Indianapolis", pub: true }, { code: "fwa", name: "Fort Wayne", pub: true },
+    { code: "sbn", name: "South Bend", pub: true }, { code: "evv", name: "Evansville", pub: true },
+    { code: "laf", name: "Lafayette" }, { code: "bmg", name: "Bloomington" }, { code: "huf", name: "Terre Haute" },
+    { code: "mie", name: "Muncie" }, { code: "gyy", name: "Gary / NW Indiana" }
+  ];
+  var NEIGHBORS = [
+    { code: "oki", name: "OKI Mesh (Cincinnati tri-state)" }, { code: "us-midwest", name: "OKI meta region" },
+    { code: "mi", name: "MichMesh Michigan" }, { code: "midwest", name: "MichMesh meta region" },
+    { code: "nei", name: "NEIMesh northeast Indiana" }, { code: "us-oh", name: "Ohio" }, { code: "us-ky", name: "Kentucky" },
+    { code: "us-il", name: "Illinois" }, { code: "us-mi", name: "Michigan" }
+  ];
+  var sel = {};
+  function chip(def, host) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "chip" + (def.pub === false || (!def.pub && host === "abbrMetros") ? " conv" : "");
+    b.setAttribute("aria-pressed", "false"); b.dataset.code = def.code;
+    b.innerHTML = def.code + " <small>" + def.name + "</small>";
+    b.addEventListener("click", function () { sel[def.code] = !sel[def.code]; b.setAttribute("aria-pressed", String(!!sel[def.code])); render(); });
+    $(host).appendChild(b);
+  }
+  METROS.forEach(function (m) { chip(m, "abbrMetros"); });
+  NEIGHBORS.forEach(function (n) { chip(n, "abbrNeighbors"); });
+  function tags() {
+    var t = ["us", "us-in"];
+    METROS.concat(NEIGHBORS).forEach(function (d) { if (sel[d.code] && t.indexOf(d.code) < 0) t.push(d.code); });
+    return t;
+  }
+  function render() {
+    var t = tags(), fw = $("abbrFw").value, lines = [];
+    if (fw === "1.16") {
+      lines.push("region def " + t.map(function (x, i) { return i < t.length - 1 ? x + "|*" : x; }).join(" "));
+    } else {
+      t.forEach(function (x) { lines.push("region put " + x); });
+      if (fw === "1.14") t.forEach(function (x) { lines.push("region allowf " + x); });
+    }
+    lines.push("region allowf *", "region save", "region list allowed");
+    $("abbrOut").textContent = lines.join("\n");
+    var bytes = t.join(",").length;
+    $("abbrBudget").textContent = t.length + " of 32 region slots · about " + bytes + " of 172 Discover Regions bytes · " + (t.length === 2 ? "no metro selected, which is fine for a rural repeater" : t.slice(2).join(", ") + " added");
+  }
+  $("abbrFw").addEventListener("change", render);
+  $("abbrCopy").addEventListener("click", function () {
+    var text = $("abbrOut").textContent, b = $("abbrCopy");
+    try { navigator.clipboard.writeText(text).then(function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1800); }); } catch (e) {}
+  });
+  render();
+  /* mode switch */
+  var A = $("modeAbbr"), F = $("modeFull"), abbr = $("abbr"), full = $("fullBuilder");
+  function mode(m) {
+    var isA = m !== "full";
+    A.setAttribute("aria-pressed", String(isA)); F.setAttribute("aria-pressed", String(!isA));
+    abbr.hidden = !isA; full.hidden = isA;
+    try { localStorage.setItem("ioc-scope-mode", isA ? "abbr" : "full"); } catch (e) {}
+    if (!isA) window.dispatchEvent(new Event("resize"));
+  }
+  A.addEventListener("click", function () { mode("abbr"); });
+  F.addEventListener("click", function () { mode("full"); });
+  var saved = null; try { saved = localStorage.getItem("ioc-scope-mode"); } catch (e) {}
+  mode(saved === "full" ? "full" : "abbr");
+})();
 </script>
 <script>
 (function () {
