@@ -46,8 +46,7 @@
 .abbr-mapbox .cty.d1 { fill: var(--d1); } .abbr-mapbox .cty.d2 { fill: var(--d2); } .abbr-mapbox .cty.d3 { fill: var(--d3); } .abbr-mapbox .cty.d4 { fill: var(--d4); } .abbr-mapbox .cty.d5 { fill: var(--d5); }
 .abbr-mapbox .cty.d6 { fill: var(--d6); } .abbr-mapbox .cty.d7 { fill: var(--d7); } .abbr-mapbox .cty.d8 { fill: var(--d8); } .abbr-mapbox .cty.d9 { fill: var(--d9); } .abbr-mapbox .cty.d10 { fill: var(--d10); } .abbr-mapbox .cty.d11 { fill: var(--d11); }
 .abbr-mapbox .cty.dist:not(.metro) { fill: var(--beacon); fill-opacity: .45; }
-.abbr-mapbox .cty.metro { fill: var(--signal-soft); cursor: pointer; }
-.abbr-mapbox .cty.metro:hover { stroke: var(--beacon); stroke-width: 1.5; }
+.abbr-mapbox .cty.metro { fill: var(--signal-soft); }
 .abbr-mapbox .cty.pick { cursor: pointer; }
 .abbr-mapbox .cty.pick:hover { stroke: var(--beacon); stroke-width: 1.5; }
 .abbr-mapbox .cty.metro.on { fill: var(--beacon); }
@@ -55,8 +54,13 @@
 .abbr-mapbox .cty.dist { stroke: var(--fg); stroke-width: 1.8; }
 .abbr-mapbox .dnum { font: 500 11px/1 var(--mono); fill: var(--muted); pointer-events: none; text-anchor: middle; }
 .abbr-mapbox .dlbl { font: 700 13px/1 var(--mono); fill: var(--fg); pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
-.abbr-mapbox .lbl { font: 700 15px/1 var(--mono); fill: var(--fg); pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
-.abbr-mapbox .lbl.on { fill: #13201C; stroke: var(--beacon); }
+.abbr-mapbox .lbl { cursor: pointer; }
+.abbr-mapbox .lbl rect { fill: var(--bg); stroke: var(--fg); stroke-width: 1.6; }
+.abbr-mapbox .lbl text { font: 700 14px/1 var(--mono); fill: var(--fg); text-anchor: middle; pointer-events: none; }
+.abbr-mapbox .lbl:hover rect, .abbr-mapbox .lbl:focus-visible rect { stroke: var(--beacon); stroke-width: 2.4; }
+.abbr-mapbox .lbl:focus-visible { outline: none; }
+.abbr-mapbox .lbl.on rect { fill: var(--beacon); stroke: var(--beacon); }
+.abbr-mapbox .lbl.on text { fill: #13201C; }
 .abbr-mapbox .city { font: 500 10px/1 var(--body); fill: var(--muted); pointer-events: none; text-anchor: middle; }
 .abbr .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
 .abbr .panel h3 { font-size: 18px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px; }
@@ -271,7 +275,7 @@
       <p class="sub"><strong>Or scope it narrower:</strong> pick only the metro or region the repeater serves.</p>
       <div class="step1-grid">
         <div>
-          <p class="sub">Click the metro county your repeater serves, or any other county to add its region. Click again to remove. The map is tinted by region (numbered as on the Visit Indiana map) with the metro areas shaded on top.</p>
+          <p class="sub">Two kinds of button on the map: <strong>click any county</strong> to add its region (tinted and numbered as on the Visit Indiana map), and <strong>click an airport-code pill</strong> to add that metro (shaded counties). Click again to remove. Pick one, or both.</p>
           <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
         </div>
         <div class="step1-side">
@@ -1081,7 +1085,7 @@ render();
       path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : "") + (dn ? " d" + dn : ""));
       var t = document.createElementNS(NS, "title"); t.textContent = c.name + " County · " + (code ? code : "no metro") + (distOf[c.name] ? " · " + distOf[c.name] : ""); path.appendChild(t);
       path.classList.add("pick");
-      path.addEventListener("click", function () { var k = code || distOf[c.name]; if (!k) return; sel[k] = !sel[k]; syncChips(); renderAbbr(); });
+      path.addEventListener("click", function () { var k = distOf[c.name]; if (!k) return; sel[k] = !sel[k]; syncChips(); renderAbbr(); });
       if (code) { (mapEls[code] = mapEls[code] || []).push(path); var sm = sums[code] = sums[code] || { x: 0, y: 0, n: 0 }; sm.x += c.cx; sm.y += c.cy; sm.n++; }
       svg.appendChild(path);
     });
@@ -1090,8 +1094,15 @@ render();
       if (!n) return; var t = document.createElementNS(NS, "text"); t.setAttribute("x", (xs / n).toFixed(1)); t.setAttribute("y", (ys / n - 14).toFixed(1)); t.setAttribute("class", "dnum"); t.textContent = String(d.n); svg.appendChild(t);
     });
     Object.keys(sums).forEach(function (code) {
-      var sm = sums[code], l = document.createElementNS(NS, "text");
-      l.setAttribute("x", (sm.x / sm.n).toFixed(1)); l.setAttribute("y", (sm.y / sm.n + 5).toFixed(1)); l.setAttribute("class", "lbl"); l.textContent = code; svg.appendChild(l); lblEls[code] = l;
+      var sm = sums[code], g = document.createElementNS(NS, "g"), r = document.createElementNS(NS, "rect"), l = document.createElementNS(NS, "text");
+      var x = sm.x / sm.n, y = sm.y / sm.n, w = 18 + code.length * 9.2;
+      r.setAttribute("x", (x - w / 2).toFixed(1)); r.setAttribute("y", (y - 12).toFixed(1)); r.setAttribute("width", w.toFixed(1)); r.setAttribute("height", "24"); r.setAttribute("rx", "12");
+      l.setAttribute("x", x.toFixed(1)); l.setAttribute("y", (y + 5).toFixed(1)); l.textContent = code;
+      g.setAttribute("class", "lbl"); g.setAttribute("role", "button"); g.setAttribute("tabindex", "0"); g.setAttribute("aria-pressed", "false");
+      var mt = document.createElementNS(NS, "title"); mt.textContent = "Add metro " + code; g.appendChild(mt); g.appendChild(r); g.appendChild(l);
+      function tog() { sel[code] = !sel[code]; g.setAttribute("aria-pressed", String(!!sel[code])); syncChips(); renderAbbr(); }
+      g.addEventListener("click", tog); g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } });
+      svg.appendChild(g); lblEls[code] = g;
     });
   })();
   function syncMap() {
@@ -1103,9 +1114,9 @@ render();
       DIST.forEach(function (d) {
         if (!sel[d.code]) return;
         var xs = 0, ys = 0, n = 0; list.forEach(function (c) { if (d.counties.indexOf(c.name) >= 0) { xs += c.cx; ys += c.cy; n++; } });
-        if (!n) return; var t = document.createElementNS(NS, "text"); t.setAttribute("x", (xs / n).toFixed(1)); t.setAttribute("y", (ys / n - 12).toFixed(1)); t.setAttribute("class", "dlbl"); t.textContent = d.code; svg.appendChild(t);
+        if (!n) return; var t = document.createElementNS(NS, "text"); t.setAttribute("x", (xs / n).toFixed(1)); t.setAttribute("y", (ys / n - 30).toFixed(1)); t.setAttribute("class", "dlbl"); t.textContent = d.code; svg.appendChild(t);
       });
-    } Object.keys(mapEls).forEach(function (code) { mapEls[code].forEach(function (p) { p.classList.toggle("on", !!sel[code]); }); if (lblEls[code]) lblEls[code].classList.toggle("on", !!sel[code]); }); }
+    } Object.keys(mapEls).forEach(function (code) { mapEls[code].forEach(function (p) { p.classList.toggle("on", !!sel[code]); }); if (lblEls[code]) { lblEls[code].classList.toggle("on", !!sel[code]); lblEls[code].setAttribute("aria-pressed", String(!!sel[code])); } }); }
   $("abbrAll").addEventListener("click", function () {
     var all = METROS.concat(DIST).every(function (m) { return sel[m.code]; });
     METROS.concat(DIST).forEach(function (m) { sel[m.code] = !all; });
