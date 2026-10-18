@@ -40,7 +40,15 @@
 .abbr { display: grid; gap: 16px; margin-bottom: 36px; }
 .abbr h2 { font-size: 26px; font-weight: 800; }
 .abbr .sub { color: var(--muted); max-width: 74ch; }
-.abbr-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.abbr-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.abbr-mapbox svg { width: 100%; height: auto; display: block; }
+.abbr-mapbox .cty { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
+.abbr-mapbox .cty.metro { fill: var(--signal-soft); cursor: pointer; }
+.abbr-mapbox .cty.metro:hover { stroke: var(--beacon); stroke-width: 1.5; }
+.abbr-mapbox .cty.metro.on { fill: var(--beacon); }
+.abbr-mapbox .lbl { font: 700 15px/1 var(--mono); fill: var(--fg); pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
+.abbr-mapbox .lbl.on { fill: #13201C; stroke: var(--beacon); }
+.abbr-mapbox .city { font: 500 10px/1 var(--body); fill: var(--muted); pointer-events: none; text-anchor: middle; }
 .abbr .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
 .abbr .panel h3 { font-size: 18px; font-weight: 700; margin: 0; }
 .abbr .panel .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -68,6 +76,7 @@
 .abbr .depth-list { margin: 10px 0 0; padding-left: 1.2em; display: grid; gap: 8px; }
 .abbr .depth-list strong { display: block; }
 .abbr .depth-list span { color: var(--muted); font-size: 14px; }
+@media (max-width: 1000px) { .abbr-grid { grid-template-columns: 1fr 1fr; } .abbr-map-panel { grid-column: 1 / -1; } }
 @media (max-width: 760px) { .abbr-grid { grid-template-columns: 1fr; } }
 .sb-head h1 { font-size: clamp(2.2rem, 5.5vw, 3.4rem); font-weight: 800; }
 .sb-head .lead { font-size: 1.05rem; max-width: 74ch; }
@@ -222,6 +231,11 @@
     <h2 id="abbr-h">Abbreviated scoping</h2>
     <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
     <div class="abbr-grid">
+      <div class="panel abbr-map-panel">
+        <h3>Click the area your repeater serves</h3>
+        <p class="sub">Each shaded area is one airport code. Click to add it, click again to remove. Unshaded counties carry <code>us</code> and <code>us-in</code> only.</p>
+        <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
+      </div>
       <div class="panel">
         <h3>Metro areas this repeater serves</h3>
         <p class="sub">Usually one. Two if you sit between them. None is fine for a rural repeater: it still carries <code>us</code> and <code>us-in</code>.</p>
@@ -950,6 +964,27 @@ render();
     names.forEach(function (n) { chanChip(n, host); });
   }
   var sel = {};
+  var metroOf = {};
+  Object.keys(PLACES).forEach(function (code) { PLACES[code].counties.forEach(function (c) { metroOf[c] = code; }); });
+  var mapEls = {}, lblEls = {};
+  (function drawMap() {
+    var svg = $("abbrMap"); if (!svg) return;
+    var list = []; try { list = COUNTIES.filter(function (c) { return c.st === "IN"; }); } catch (e) { return; }
+    var NS = "http://www.w3.org/2000/svg", sums = {};
+    list.forEach(function (c) {
+      var code = metroOf[c.name], path = document.createElementNS(NS, "path");
+      path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : ""));
+      var t = document.createElementNS(NS, "title"); t.textContent = c.name + " County" + (code ? " · " + code : " · us, us-in only"); path.appendChild(t);
+      if (code) { path.addEventListener("click", function () { sel[code] = !sel[code]; syncChips(); renderAbbr(); }); (mapEls[code] = mapEls[code] || []).push(path); var sm = sums[code] = sums[code] || { x: 0, y: 0, n: 0 }; sm.x += c.cx; sm.y += c.cy; sm.n++; }
+      svg.appendChild(path);
+    });
+    Object.keys(sums).forEach(function (code) {
+      var sm = sums[code], l = document.createElementNS(NS, "text");
+      l.setAttribute("x", (sm.x / sm.n).toFixed(1)); l.setAttribute("y", (sm.y / sm.n + 5).toFixed(1)); l.setAttribute("class", "lbl"); l.textContent = code; svg.appendChild(l); lblEls[code] = l;
+    });
+  })();
+  function syncMap() { Object.keys(mapEls).forEach(function (code) { mapEls[code].forEach(function (p) { p.classList.toggle("on", !!sel[code]); }); if (lblEls[code]) lblEls[code].classList.toggle("on", !!sel[code]); }); }
+  function syncChips() { document.querySelectorAll("#abbrMetros .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); }
   function chip(def, host) {
     var b = document.createElement("button"); b.type = "button"; b.className = "chip" + (def.pub === false || (!def.pub && host === "abbrMetros") ? " conv" : "");
     b.setAttribute("aria-pressed", "false"); b.dataset.code = def.code;
@@ -975,7 +1010,7 @@ render();
     lines.push("region allowf *", "region save", "region list allowed");
     $("abbrOut").textContent = lines.join("\n");
     var bytes = t.join(",").length;
-    renderChans();
+    renderChans(); syncMap();
     $("abbrBudget").textContent = t.length + " of 32 region slots · about " + bytes + " of 172 Discover Regions bytes · " + (t.length === 2 ? "no metro selected, which is fine for a rural repeater" : t.slice(2).join(", ") + " added");
   }
   $("abbrFw").addEventListener("change", renderAbbr);
