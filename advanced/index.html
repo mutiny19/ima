@@ -59,7 +59,13 @@
 .abbr-mapbox .lbl.on { fill: #13201C; stroke: var(--beacon); }
 .abbr-mapbox .city { font: 500 10px/1 var(--body); fill: var(--muted); pointer-events: none; text-anchor: middle; }
 .abbr .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; align-content: start; }
-.abbr .panel h3 { font-size: 18px; font-weight: 700; margin: 0; }
+.abbr .panel h3 { font-size: 18px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px; }
+.abbr .panel h4 { font-size: 15px; font-weight: 700; margin: 6px 0 0; }
+.abbr .stepnum { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--fg); color: var(--bg); font: 700 14px/1 var(--body); flex: none; }
+.abbr .step1-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 20px; align-items: start; }
+.abbr .step1-side { display: grid; gap: 10px; align-content: start; }
+.abbr .nearby { margin: 0; padding-left: 18px; display: grid; gap: 6px; } .abbr .nearby span { color: var(--muted); }
+@media (max-width: 760px) { .abbr .step1-grid { grid-template-columns: 1fr; } }
 .abbr .panel .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .abbr .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .abbr .chip { font: 500 14px/1 var(--mono); border: 2px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 10px 14px; min-height: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
@@ -246,48 +252,64 @@
   <section id="abbr" class="abbr" aria-labelledby="abbr-h">
     <h2 id="abbr-h">Abbreviated scoping</h2>
     <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
-    <div class="abbr-grid">
-      <div class="panel abbr-map-panel">
-        <h3>Click the metro or region your repeater serves</h3>
-        <p class="sub">The map is tinted by region (numbered as on the Visit Indiana map) with the metro areas shaded on top. Click a metro county to add its airport code; click any other county to add its region. Click again to remove.</p>
-        <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
-      </div>
-      <div class="panel">
-        <h3>Metro areas this repeater serves</h3>
-        <p class="sub">Usually one. Two if you sit between them. None is fine for a rural repeater: it still carries <code>us</code> and <code>us-in</code>.</p>
-        <div class="chips" id="abbrMetros"></div>
-        <div class="abbr-actions">
-          <button type="button" class="chip all" id="abbrAll" aria-pressed="false">Open Indiana Mesh: all areas</button>
-          <button type="button" class="chip" id="abbrClear">Clear</button>
+    <section class="panel step" aria-labelledby="step1-h">
+      <h3 id="step1-h"><span class="stepnum">1</span> Where is it?</h3>
+      <div class="step1-grid">
+        <div>
+          <p class="sub">Click the metro county your repeater serves, or any other county to add its region. Click again to remove. The map is tinted by region (numbered as on the Visit Indiana map) with the metro areas shaded on top.</p>
+          <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
         </div>
-        <p class="note">"Open Indiana Mesh" carries every metro code that covers part of Indiana, including <code>cvg</code> and <code>sdf</code> for the counties OKI lists in the Cincinnati and Louisville metros, so metro-scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 13 tags, well inside the budget. Add districts separately if you want district-scoped traffic too.</p>
-        <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them yet; using one is a proposal, and it only matters once a second repeater carries it.</p>
-        <h3>Regions</h3>
-        <p class="sub">The eleven regions of the state's own <a href="https://visitindiana.in.gov/regions/" target="_blank" rel="noopener">Visit Indiana map</a>, the names most Hoosiers already use. Convention: <code>us-in-</code> plus the region's short code (<code>nw</code>, <code>nc</code>, <code>ne</code>, <code>wv</code>, <code>wc</code>, <code>cen</code>, <code>ec</code>, <code>sc</code>, <code>sw</code>, <code>se</code>, <code>s</code>). Regions fill in the counties no metro covers; pick a region, a metro, or both. No group publishes these yet.</p>
-        <div class="chips" id="abbrDistricts"></div>
-        <h3>Near a border?</h3>
-        <p class="sub">Add a neighbouring group's own tags, spelled exactly as they publish them. Each one only lets more scoped traffic through.</p>
-        <div class="chips" id="abbrNeighbors"></div>
+        <div class="step1-side">
+          <h4>Metro areas</h4>
+          <p class="sub">Usually one. Two if you sit between them. None is fine for a rural repeater: it still carries <code>us</code> and <code>us-in</code>.</p>
+          <div class="chips" id="abbrMetros"></div>
+          <div class="abbr-actions">
+            <button type="button" class="chip all" id="abbrAll" aria-pressed="false">Open Indiana Mesh: all areas</button>
+            <button type="button" class="chip" id="abbrClear">Clear</button>
+          </div>
+          <p class="note">"Open Indiana Mesh" carries every metro code that covers part of Indiana, including <code>cvg</code> and <code>sdf</code> for the counties OKI lists in the Cincinnati and Louisville metros, so metro-scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 13 tags, well inside the budget.</p>
+          <h4>Regions</h4>
+          <p class="sub">If no metro fits, the region. The eleven regions of the state's own <a href="https://visitindiana.in.gov/regions/" target="_blank" rel="noopener">Visit Indiana map</a>, the names most Hoosiers already use: <code>us-in-</code> plus the region's short code. No group publishes these yet; pick a region, a metro, or both.</p>
+          <div class="chips" id="abbrDistricts"></div>
+          <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them; using one is a proposal, and it only matters once a second repeater carries it.</p>
+        </div>
       </div>
-      <div class="panel">
-        <div class="head"><h3>Repeater commands</h3><button class="copy" type="button" id="abbrCopy">Copy</button></div>
-        <label class="k" for="abbrFw">Firmware</label>
-        <select id="abbrFw">
-          <option value="1.16">1.16 or newer (region def)</option>
-          <option value="1.15">1.15 or openHop (region put)</option>
-          <option value="1.14">1.14 and older (region put + allowf)</option>
-        </select>
-        <pre id="abbrOut"></pre>
-        <p class="note" id="abbrBudget"></p>
-        <p class="note">Run them on the repeater over USB serial or the app's remote admin, then <code>region list allowed</code> should show <code>*</code> plus every tag. Companions need nothing. Reference: MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>; neighbours' lists: <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>.</p>
+    </section>
+    <section class="panel step" aria-labelledby="step2-h">
+      <h3 id="step2-h"><span class="stepnum">2</span> Does it reach across the state line?</h3>
+      <p class="sub">Most Indiana repeaters skip this step. Near a border, add the neighbouring group's own tags, spelled exactly as they publish them; each one only lets more scoped traffic through. <code>oki</code>, <code>us-midwest</code>, <code>us-oh</code>, and <code>us-ky</code> are published by OKI Mesh; <code>mi</code> and <code>midwest</code> by MichMesh; <code>nei</code> by NEIMesh. <code>us-il</code> and <code>us-mi</code> follow the state convention but no group publishes them yet.</p>
+      <div class="chips" id="abbrNeighbors"></div>
+    </section>
+    <section class="panel step" aria-labelledby="step3-h">
+      <div class="head"><h3 id="step3-h"><span class="stepnum">3</span> Get the code</h3><button class="copy" type="button" id="abbrCopy">Copy</button></div>
+      <label class="k" for="abbrFw">Firmware</label>
+      <select id="abbrFw">
+        <option value="1.16">1.16 or newer (region def)</option>
+        <option value="1.15">1.15 or openHop (region put)</option>
+        <option value="1.14">1.14 and older (region put + allowf)</option>
+      </select>
+      <pre id="abbrOut"></pre>
+      <p class="note" id="abbrBudget"></p>
+      <p class="note">Run them on the repeater over USB serial or the app's remote admin, then <code>region list allowed</code> should show <code>*</code> plus every tag. Companions need nothing. Reference: MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.</p>
+      <div id="abbrChanPanel">
+        <h4>Channel suggestions for what you picked</h4>
+        <p class="sub">Scoping is for the rare message you want kept local. For everyday local chat, a channel does the job with nothing to configure on any repeater. Hashtag channels take their key from the name, so anyone who types the same name lands in the same room. Convention: <code>#</code> plus the place name, lowercase, letters only.</p>
+        <div class="chips" id="abbrChans"></div>
+        <p class="note">Tap to copy, then add it in the MeshCore app. People share channel names worth joining in <code>#porchlight</code>; these are only suggestions that follow the naming rule.</p>
       </div>
-    </div>
-    <div class="panel" id="abbrChanPanel">
-      <h3>Channel suggestions for what you picked</h3>
-      <p class="sub">Scoping is for the rare message you want kept local. For everyday local chat, a channel does the job with nothing to configure on any repeater. Hashtag channels take their key from the name, so anyone who types the same name lands in the same room. Convention: <code>#</code> plus the place name, lowercase, letters only.</p>
-      <div class="chips" id="abbrChans"></div>
-      <p class="note">Tap to copy, then add it in the MeshCore app. People share channel names worth joining in <code>#porchlight</code>; these are only suggestions that follow the naming rule.</p>
-    </div>
+    </section>
+    <section class="panel step" aria-labelledby="step4-h">
+      <h3 id="step4-h"><span class="stepnum">4</span> Also on the mesh nearby</h3>
+      <p class="sub">Each group describes its own area and publishes its own tags. Near a state line, theirs is worth joining too; the <a href="../meshcore/#nb-h">start page</a> keeps the full list.</p>
+      <ul class="nearby">
+        <li><a href="https://okimesh.org" target="_blank" rel="noopener">OKI Mesh</a> <span>southwest Ohio, southeast Indiana, northern Kentucky · <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">region scopes</a></span></li>
+        <li><a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a> <span>northeast Indiana, Fort Wayne first</span></li>
+        <li><a href="https://chicagolandmesh.org" target="_blank" rel="noopener">Chicagoland Mesh</a> <span>Chicago area and northwest Indiana</span></li>
+        <li><a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a> <span>Michigan</span></li>
+        <li><a href="https://neome.sh" target="_blank" rel="noopener">NEO Mesh</a> <span>northeast and north central Ohio</span></li>
+        <li><a href="https://nashme.sh" target="_blank" rel="noopener">NashMesh</a> <span>greater Nashville, for the far south</span></li>
+      </ul>
+    </section>
     <details class="depth">
       <summary>Why these tags and not a hierarchy</summary>
       <ul class="depth-list">
@@ -988,7 +1010,7 @@ render();
     { code: "oki", name: "OKI Mesh (Cincinnati tri-state)" }, { code: "us-midwest", name: "OKI meta region" },
     { code: "mi", name: "MichMesh Michigan" }, { code: "midwest", name: "MichMesh meta region" },
     { code: "nei", name: "NEIMesh northeast Indiana" }, { code: "us-oh", name: "Ohio" }, { code: "us-ky", name: "Kentucky" },
-    { code: "us-il", name: "Illinois" }, { code: "us-mi", name: "Michigan" }
+    { code: "us-il", name: "Illinois", pub: false }, { code: "us-mi", name: "Michigan", pub: false }
   ];
   var PLACES = {
     ind: { cities: ["Indianapolis", "Indy", "Carmel", "Fishers", "Noblesville", "Greenwood", "Avon", "Plainfield"], counties: ["Marion", "Hamilton", "Hendricks", "Johnson", "Hancock", "Boone", "Morgan", "Shelby", "Madison", "Putnam", "Brown"] },
