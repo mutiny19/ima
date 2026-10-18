@@ -58,6 +58,8 @@
 .abbr .chip[aria-pressed="true"] { background: var(--beacon); border-color: var(--beacon); color: #13201C; }
 .abbr .chip[aria-pressed="true"] small { color: #13201C; }
 .abbr .chip.conv { border-style: dashed; }
+.abbr .abbr-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.abbr .chip.all { font-family: var(--body); font-weight: 700; }
 .abbr .note { font-size: 13px; color: var(--muted); }
 .abbr .pub, .abbr .conv { font: 600 11px/1 var(--mono); border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; }
 .abbr .conv { border-style: dashed; }
@@ -240,6 +242,11 @@
         <h3>Metro areas this repeater serves</h3>
         <p class="sub">Usually one. Two if you sit between them. None is fine for a rural repeater: it still carries <code>us</code> and <code>us-in</code>.</p>
         <div class="chips" id="abbrMetros"></div>
+        <div class="abbr-actions">
+          <button type="button" class="chip all" id="abbrAll" aria-pressed="false">Open Indiana Mesh: all areas</button>
+          <button type="button" class="chip" id="abbrClear">Clear</button>
+        </div>
+        <p class="note">"Open Indiana Mesh" carries every Indiana area code, so scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 11 tags, well inside the budget.</p>
         <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them yet; using one is a proposal, and it only matters once a second repeater carries it.</p>
         <h3>Near a border?</h3>
         <p class="sub">Add a neighbouring group's own tags, spelled exactly as they publish them. Each one only lets more scoped traffic through.</p>
@@ -984,7 +991,15 @@ render();
     });
   })();
   function syncMap() { Object.keys(mapEls).forEach(function (code) { mapEls[code].forEach(function (p) { p.classList.toggle("on", !!sel[code]); }); if (lblEls[code]) lblEls[code].classList.toggle("on", !!sel[code]); }); }
-  function syncChips() { document.querySelectorAll("#abbrMetros .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); }
+  $("abbrAll").addEventListener("click", function () {
+    var all = METROS.every(function (m) { return sel[m.code]; });
+    METROS.forEach(function (m) { sel[m.code] = !all; });
+    syncChips(); renderAbbr();
+  });
+  $("abbrClear").addEventListener("click", function () { sel = {}; syncChips(); renderAbbr(); });
+  function syncChips() {
+    var all = METROS.every(function (m) { return sel[m.code]; });
+    $("abbrAll").setAttribute("aria-pressed", String(all)); document.querySelectorAll("#abbrMetros .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(!!sel[b.dataset.code])); }); }
   function chip(def, host) {
     var b = document.createElement("button"); b.type = "button"; b.className = "chip" + (def.pub === false || (!def.pub && host === "abbrMetros") ? " conv" : "");
     b.setAttribute("aria-pressed", "false"); b.dataset.code = def.code;
@@ -1010,7 +1025,7 @@ render();
     lines.push("region allowf *", "region save", "region list allowed");
     $("abbrOut").textContent = lines.join("\n");
     var bytes = t.join(",").length;
-    renderChans(); syncMap();
+    renderChans(); syncMap(); syncChips();
     $("abbrBudget").textContent = t.length + " of 32 region slots · about " + bytes + " of 172 Discover Regions bytes · " + (t.length === 2 ? "no metro selected, which is fine for a rural repeater" : t.slice(2).join(", ") + " added");
   }
   $("abbrFw").addEventListener("change", renderAbbr);
