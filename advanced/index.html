@@ -76,6 +76,11 @@
 .abbr .copy { font: 600 13px/1 var(--body); border: 1px solid var(--line); background: var(--bg); color: var(--link); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
 .abbr select { font: 400 15px/1.3 var(--body); padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
 .abbr .k { font-weight: 600; font-size: 14px; }
+.method { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-top: 16px; }
+.method h3 { font-size: 18px; font-weight: 700; margin: 0 0 8px; }
+.method ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; max-width: 80ch; font-size: 14.5px; color: var(--muted); }
+.method li strong { color: var(--fg); }
+.method a { color: var(--link); }
 .abbr-like { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: grid; gap: 10px; margin-top: 16px; }
 .abbr-like h3 { font-size: 18px; font-weight: 700; margin: 0; }
 .abbr-like .sub { color: var(--muted); max-width: 74ch; }
@@ -293,6 +298,19 @@
         <li><strong>Why not "central" or "east central" tags.</strong><span>Those names have no agreed county boundaries and no neighbour carries them, so two people following the convention would still pick differently. The ten IDHS districts in the County &amp; district mode are the defined version; the metro codes already cover the same ground.</span></li>
       </ul>
     </details>
+    <section class="method" aria-labelledby="abbr-method-h">
+      <h3 id="abbr-method-h">Method</h3>
+      <ol>
+        <li><strong>Base tags.</strong> Every repeater carries <code>us</code> and <code>us-in</code>, with <code>region allowf *</code> and no default region, so unscoped traffic keeps flowing and nothing is held back.</li>
+        <li><strong>Metro codes.</strong> The lowercase IATA code of the metro's main airport. Codes marked <em>published</em> are the ones in <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh's region list</a> and the region lists of the observer services (Waev, MeshMapper, the Offband firmware). Codes marked <em>by convention</em> follow the same rule but no group has published them; listing one here is a proposal.</li>
+        <li><strong>Which counties are in a metro.</strong> The counties of the metro statistical area, as the County &amp; district builder already maps them for OKI's metros; <code>cvg</code> and <code>sdf</code> cover the Indiana counties OKI lists in the Cincinnati and Louisville metros. Counties outside every metro have no metro code; they are reached through their district.</li>
+        <li><strong>Districts.</strong> The same ten districts, codes, and county membership as the County &amp; district builder, so a district tag is spelled identically in both modes. Tag form: <code>us-in-</code> plus the district code.</li>
+        <li><strong>Neighbours' tags.</strong> Spelled exactly as each group publishes them (<a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>), never translated, because tags match by exact string.</li>
+        <li><strong>Commands.</strong> The flat <code>region def a|* b|* c</code> form OKI's own examples use on firmware 1.16 and newer; one <code>region put</code> per tag on 1.15 and openHop; plus <code>region allowf</code> per tag on 1.14. Syntax from MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a> reference.</li>
+        <li><strong>Limits shown.</strong> 32 region slots per repeater and a 172-byte Discover Regions reply, from the firmware source; the counter under the commands is tags and bytes against those caps.</li>
+        <li><strong>Changing any of this.</strong> Codes, county lists, and districts live in one table in this page's source; propose a change by <a href="https://github.com/mutiny19/ima/issues/new/choose" target="_blank" rel="noopener">opening an issue</a>, with the published source for the new value.</li>
+      </ol>
+    </section>
   </section>
 
   <div id="fullBuilder" hidden>
@@ -440,6 +458,19 @@
   <footer class="sb-foot">
     Districts follow the <a href="https://www.in.gov/dhs/files/IDHS-Districts-Map.pdf" target="_blank" rel="noopener">IDHS District Map</a>. The district and county codes are Indiana's reference set, maintained on this page; to propose a change, <a href="https://github.com/mutiny19/ima/issues/new" target="_blank" rel="noopener">open an issue</a>. OKI metro membership is approximated from metro statistical areas; OKI Mesh's own maps govern. Commands are checked against a copy of MeshCore's <code>region def</code> and <code>region put</code> parsing before display, and the limits (32 regions, a 172-byte Discover Regions reply) come from the firmware source. Out-of-state counties add only their state tag and, with OKI metros added, their metro tag. Command reference: <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.
   </footer>
+  <section class="method" aria-labelledby="full-method-h">
+    <h3 id="full-method-h">Method</h3>
+    <ol>
+      <li><strong>Start from Phase 1.</strong> <code>us</code>, <code>us-in</code>, <code>us-oh</code>, <code>us-ky</code>, <code>us-mi</code>, <code>us-il</code> with unscoped traffic allowed and no default region. With nothing selected, the output is exactly that.</li>
+      <li><strong>Districts.</strong> Indiana's ten homeland-security districts from the <a href="https://www.in.gov/dhs/files/IDHS-Districts-Map.pdf" target="_blank" rel="noopener">IDHS District Map</a>, numbered 1 to 10, with short codes (<code>nw</code>, <code>nc</code>, <code>ne</code>, <code>wc</code>, <code>cen</code>, <code>ec</code>, <code>w</code>, <code>sc</code>, <code>se</code>, <code>sw</code>). Each county belongs to exactly one.</li>
+      <li><strong>County codes.</strong> Three letters per county, chosen to be unique across Indiana; the lookup table is in this page's source. Indiana has no agreed statewide list yet, so these are this page's reference set.</li>
+      <li><strong>Tag chains.</strong> <code>us-in-&lt;district&gt;-&lt;county&gt;</code> by default (the <code>us-in-cen-mrn</code> format, which keeps <code>us-in</code> as a real tag on the chain), or the <code>in-us-cen-mrn</code> alternative. Only the tags you tick are emitted; the tree shown is display only, since the firmware matches by exact string.</li>
+      <li><strong>Shared tags.</strong> OKI Mesh's <code>oki</code>, <code>us-midwest</code>, <code>us-southeast</code>, and metro codes are offered as published; metro membership for out-of-state counties is approximated from metro statistical areas, and OKI's own maps govern.</li>
+      <li><strong>Checks before display.</strong> Commands are run through a copy of MeshCore's <code>region def</code> and <code>region put</code> parsing; the 32-slot and 172-byte limits come from the firmware source; steps are sized to the CLI message length you choose.</li>
+      <li><strong>Companion side.</strong> The companion panel only shows how a scope would be set; Indiana's starting point leaves companions unscoped. Any scope must be a tag the repeaters along the path carry.</li>
+      <li><strong>Changing any of this.</strong> Districts, county codes, and shared tags live in tables in this page's source; propose a change by <a href="https://github.com/mutiny19/ima/issues/new/choose" target="_blank" rel="noopener">opening an issue</a>, with the published source for the new value.</li>
+    </ol>
+  </section>
   <div class="panel abbr-like" id="fullChanPanel">
     <h3>Channel suggestions for the counties you picked</h3>
     <p class="sub">For everyday local chat, a channel beats a scope: nothing to configure on any repeater. Convention: <code>#</code> plus the county or city name, lowercase, letters only. Tap to copy.</p>
