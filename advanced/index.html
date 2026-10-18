@@ -77,6 +77,10 @@
 .abbr .open-box { display: grid; gap: 12px; padding: 14px 16px; border: 2px solid var(--beacon); border-radius: 12px; background: var(--signal-soft, var(--bg)); max-width: 74ch; }
 .abbr .chip.all { font-family: var(--body); font-weight: 700; }
 .abbr .note { font-size: 13px; color: var(--muted); }
+.abbr .alert { padding: 12px 14px; border-radius: 10px; border: 2px solid #c9a227; background: rgba(201, 162, 39, .12); font-size: 14px; line-height: 1.45; }
+.abbr .alert.over { border-color: #c0392b; background: rgba(192, 57, 43, .12); font-weight: 600; }
+.abbr pre.over { outline: 2px solid #c0392b; }
+.abbr .copy:disabled { opacity: .5; cursor: not-allowed; }
 .abbr .pub, .abbr .conv { font: 600 11px/1 var(--mono); border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; }
 .abbr .conv { border-style: dashed; }
 .abbr pre { margin: 0; background: var(--code-bg); color: var(--code-fg); border-radius: 8px; padding: 12px 14px; font: 500 14px/1.6 var(--mono); overflow-x: auto; white-space: pre; }
@@ -295,6 +299,7 @@
         <option value="1.15">1.15 or openHop (region put)</option>
         <option value="1.14">1.14 and older (region put + allowf)</option>
       </select>
+      <div class="alert" id="abbrAlert" role="alert" hidden></div>
       <pre id="abbrOut"></pre>
       <p class="note" id="abbrBudget"></p>
       <p class="note">Run them on the repeater over USB serial or the app's remote admin, then <code>region list allowed</code> should show <code>*</code> plus every tag. Companions need nothing. Reference: MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.</p>
@@ -1137,6 +1142,12 @@ render();
     var bytes = t.join(",").length;
     renderChans(); syncMap(); syncChips();
     $("abbrBudget").textContent = t.length + " of 32 region slots · about " + bytes + " of 172 Discover Regions bytes · " + (t.length === 2 ? "no metro selected, which is fine for a rural repeater" : t.slice(2).join(", ") + " added");
+    var over = t.length > 32 || bytes > 172, near = !over && (t.length > 29 || bytes > 160), al = $("abbrAlert");
+    al.hidden = !(over || near); al.className = "alert" + (over ? " over" : " near");
+    al.textContent = over
+      ? "Too many scopes selected: " + t.length + " tags, about " + bytes + " bytes. A repeater holds 32 tags and answers Discover Regions in 172 bytes, so this list will not fit and the commands are held back. Remove a few tags; neighbour tags, and a single metro already inside a selected region, are the usual extras."
+      : "Close to the limit: " + t.length + " of 32 tags, about " + bytes + " of 172 bytes. One or two more and the list will not fit.";
+    $("abbrCopy").disabled = over; $("abbrOut").classList.toggle("over", over);
   }
   $("abbrFw").addEventListener("change", renderAbbr);
   $("abbrCopy").addEventListener("click", function () {
