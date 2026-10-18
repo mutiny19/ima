@@ -27,11 +27,11 @@
   --f-display: var(--display); --f-body: var(--body); --f-mono: var(--mono);
   --county:#dfe6e1; --county-out:#e9ece9; --county-line:#ffffff; --sel:#d99a12; --sel-ink:#3a2700; --home:#9a5d00;
   --ok:#2f7d4a; --warn:#a96a00; --crit:#b3261e;
-  --d1:#dbe7e2;--d2:#e3e3d6;--d3:#dde0ea;--d4:#e7ded9;--d5:#d7e6ea;--d6:#e6e0e8;--d7:#dfe8d6;--d8:#ebe3d3;--d9:#d9e1e8;--d10:#e8e0dc;
+  --d1:#dbe7e2;--d2:#e3e3d6;--d3:#dde0ea;--d4:#e7ded9;--d5:#d7e6ea;--d6:#e6e0e8;--d7:#dfe8d6;--d8:#ebe3d3;--d9:#d9e1e8;--d10:#e8e0dc;--d11:#e4e6dd;
   max-width: 1280px; margin: 0 auto; padding-inline: 24px; padding-block: 36px 48px; display: grid; gap: 20px; font-size: 15px; line-height: 1.5; }
 :root[data-theme="dark"] .sb { --county:#24312d; --county-out:#1b2421; --county-line:#0C1512; --sel:#e7ac2c; --sel-ink:#241800; --home:#ffcf6b;
   --ok:#6cc58a; --warn:#e3a640; --crit:#ff8a80;
-  --d1:#22312c;--d2:#2b2d22;--d3:#252a36;--d4:#302824;--d5:#1f3135;--d6:#2e2732;--d7:#263222;--d8:#332c1f;--d9:#232c34;--d10:#312a26; }
+  --d1:#22312c;--d2:#2b2d22;--d3:#252a36;--d4:#302824;--d5:#1f3135;--d6:#2e2732;--d7:#263222;--d8:#332c1f;--d9:#232c34;--d10:#312a26;--d11:#2a3027; }
 .sb-head { display: grid; gap: 10px; }
 .mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 22px 0 18px; }
 .mode-btn { font: 700 15px/1 var(--body); border: 2px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 8px; padding: 12px 18px; min-height: 44px; cursor: pointer; }
@@ -44,7 +44,7 @@
 .abbr-mapbox svg { width: 100%; height: auto; display: block; }
 .abbr-mapbox .cty { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
 .abbr-mapbox .cty.d1 { fill: var(--d1); } .abbr-mapbox .cty.d2 { fill: var(--d2); } .abbr-mapbox .cty.d3 { fill: var(--d3); } .abbr-mapbox .cty.d4 { fill: var(--d4); } .abbr-mapbox .cty.d5 { fill: var(--d5); }
-.abbr-mapbox .cty.d6 { fill: var(--d6); } .abbr-mapbox .cty.d7 { fill: var(--d7); } .abbr-mapbox .cty.d8 { fill: var(--d8); } .abbr-mapbox .cty.d9 { fill: var(--d9); } .abbr-mapbox .cty.d10 { fill: var(--d10); }
+.abbr-mapbox .cty.d6 { fill: var(--d6); } .abbr-mapbox .cty.d7 { fill: var(--d7); } .abbr-mapbox .cty.d8 { fill: var(--d8); } .abbr-mapbox .cty.d9 { fill: var(--d9); } .abbr-mapbox .cty.d10 { fill: var(--d10); } .abbr-mapbox .cty.d11 { fill: var(--d11); }
 .abbr-mapbox .cty.dist:not(.metro) { fill: var(--beacon); fill-opacity: .45; }
 .abbr-mapbox .cty.metro { fill: var(--signal-soft); cursor: pointer; }
 .abbr-mapbox .cty.metro:hover { stroke: var(--beacon); stroke-width: 1.5; }
@@ -248,8 +248,8 @@
     <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
     <div class="abbr-grid">
       <div class="panel abbr-map-panel">
-        <h3>Click the metro or district your repeater serves</h3>
-        <p class="sub">The map is tinted by district (numbered) with the metro areas shaded on top. Click a metro county to add its airport code; click any other county to add its district. Click again to remove.</p>
+        <h3>Click the metro or region your repeater serves</h3>
+        <p class="sub">The map is tinted by region (numbered as on the Visit Indiana map) with the metro areas shaded on top. Click a metro county to add its airport code; click any other county to add its region. Click again to remove.</p>
         <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
       </div>
       <div class="panel">
@@ -262,8 +262,8 @@
         </div>
         <p class="note">"Open Indiana Mesh" carries every metro code that covers part of Indiana, including <code>cvg</code> and <code>sdf</code> for the counties OKI lists in the Cincinnati and Louisville metros, so metro-scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 13 tags, well inside the budget. Add districts separately if you want district-scoped traffic too.</p>
         <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them yet; using one is a proposal, and it only matters once a second repeater carries it.</p>
-        <h3>Districts</h3>
-        <p class="sub">The same ten districts as the County &amp; district builder, with the same tags, so the two modes never disagree: <code>us-in-</code> plus the district's short code (<code>nw</code>, <code>nc</code>, <code>ne</code>, <code>wc</code>, <code>cen</code>, <code>ec</code>, <code>w</code>, <code>sc</code>, <code>se</code>, <code>sw</code>). Districts fill in the counties no metro covers; pick a district, a metro, or both. No group publishes these yet.</p>
+        <h3>Regions</h3>
+        <p class="sub">The eleven regions of the state's own <a href="https://visitindiana.in.gov/regions/" target="_blank" rel="noopener">Visit Indiana map</a>, the names most Hoosiers already use. Convention: <code>us-in-</code> plus the region's short code (<code>nw</code>, <code>nc</code>, <code>ne</code>, <code>wv</code>, <code>wc</code>, <code>cen</code>, <code>ec</code>, <code>sc</code>, <code>sw</code>, <code>se</code>, <code>s</code>). Regions fill in the counties no metro covers; pick a region, a metro, or both. No group publishes these yet.</p>
         <div class="chips" id="abbrDistricts"></div>
         <h3>Near a border?</h3>
         <p class="sub">Add a neighbouring group's own tags, spelled exactly as they publish them. Each one only lets more scoped traffic through.</p>
@@ -304,7 +304,7 @@
         <li><strong>Base tags.</strong> Every repeater carries <code>us</code> and <code>us-in</code>, with <code>region allowf *</code> and no default region, so unscoped traffic keeps flowing and nothing is held back.</li>
         <li><strong>Metro codes.</strong> The lowercase IATA code of the metro's main airport. Codes marked <em>published</em> are the ones in <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh's region list</a> and the region lists of the observer services (Waev, MeshMapper, the Offband firmware). Codes marked <em>by convention</em> follow the same rule but no group has published them; listing one here is a proposal.</li>
         <li><strong>Which counties are in a metro.</strong> The counties of the metro statistical area, as the County &amp; district builder already maps them for OKI's metros; <code>cvg</code> and <code>sdf</code> cover the Indiana counties OKI lists in the Cincinnati and Louisville metros. Counties outside every metro have no metro code; they are reached through their district.</li>
-        <li><strong>Districts.</strong> The same ten districts, codes, and county membership as the County &amp; district builder, so a district tag is spelled identically in both modes. Tag form: <code>us-in-</code> plus the district code.</li>
+        <li><strong>Regions.</strong> The eleven regions of the <a href="https://visitindiana.in.gov/regions/" target="_blank" rel="noopener">Visit Indiana map</a>, with each region's county list taken from its page there (October 2026). Tag form: <code>us-in-</code> plus the region's short code. Note that the County &amp; district builder uses the ten IDHS districts instead, so a few region tags share a code with a district tag that covers a different set of counties (<code>nw</code> and <code>cen</code> are identical; <code>nc</code>, <code>ne</code>, <code>wc</code>, <code>sc</code>, <code>se</code>, <code>sw</code> differ at the edges). A repeater should follow one scheme or the other.</li>
         <li><strong>Neighbours' tags.</strong> Spelled exactly as each group publishes them (<a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>), never translated, because tags match by exact string.</li>
         <li><strong>Commands.</strong> The flat <code>region def a|* b|* c</code> form OKI's own examples use on firmware 1.16 and newer; one <code>region put</code> per tag on 1.15 and openHop; plus <code>region allowf</code> per tag on 1.14. Syntax from MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a> reference.</li>
         <li><strong>Limits shown.</strong> 32 region slots per repeater and a 172-byte Discover Regions reply, from the firmware source; the counter under the commands is tags and bytes against those caps.</li>
@@ -1019,7 +1019,21 @@ render();
   var sel = {};
   var metroOf = {}, inferred = {};
   Object.keys(PLACES).forEach(function (code) { PLACES[code].counties.forEach(function (c) { metroOf[c] = code; }); });
-  var DIST = []; try { DIST = Object.keys(DISTRICTS).map(function (k) { return { code: "us-in-" + k, key: k, name: DISTRICTS[k].n + " · " + DISTRICTS[k].name, counties: DISTRICTS[k].c, n: DISTRICTS[k].n }; }).sort(function (a, b) { return a.n - b.n; }); } catch (e) {}
+  /* The eleven regions of the Visit Indiana map (visitindiana.in.gov/regions), county lists from each region's page, Oct 2026. */
+  var REGIONS = [
+    { k: "nw",  n: 1,  name: "Northwest",     c: ["Jasper", "Lake", "LaPorte", "Newton", "Porter"] },
+    { k: "nc",  n: 2,  name: "North Central", c: ["Elkhart", "Fulton", "Marshall", "Pulaski", "St. Joseph", "Starke"] },
+    { k: "ne",  n: 3,  name: "Northeast",     c: ["Adams", "Allen", "DeKalb", "Huntington", "Kosciusko", "LaGrange", "Noble", "Steuben", "Wabash", "Wells", "Whitley"] },
+    { k: "wv",  n: 4,  name: "Wabash Valley", c: ["Benton", "Carroll", "Cass", "Clinton", "Miami", "Tippecanoe", "Warren", "White"] },
+    { k: "wc",  n: 5,  name: "West-Central",  c: ["Clay", "Fountain", "Montgomery", "Parke", "Putnam", "Sullivan", "Vermillion", "Vigo"] },
+    { k: "cen", n: 6,  name: "Central",       c: ["Boone", "Hamilton", "Hancock", "Hendricks", "Johnson", "Marion", "Morgan", "Shelby"] },
+    { k: "ec",  n: 7,  name: "East Central",  c: ["Blackford", "Delaware", "Fayette", "Grant", "Henry", "Howard", "Jay", "Madison", "Randolph", "Rush", "Tipton", "Wayne"] },
+    { k: "sc",  n: 8,  name: "South Central", c: ["Bartholomew", "Brown", "Greene", "Jackson", "Lawrence", "Monroe", "Owen"] },
+    { k: "sw",  n: 9,  name: "Southwest",     c: ["Daviess", "Dubois", "Gibson", "Knox", "Martin", "Pike", "Posey", "Spencer", "Vanderburgh", "Warrick"] },
+    { k: "se",  n: 10, name: "Southeast",     c: ["Dearborn", "Decatur", "Franklin", "Jefferson", "Jennings", "Ohio", "Ripley", "Switzerland", "Union"] },
+    { k: "s",   n: 11, name: "South",         c: ["Clark", "Crawford", "Floyd", "Harrison", "Orange", "Perry", "Scott", "Washington"] }
+  ];
+  var DIST = REGIONS.map(function (r) { return { code: "us-in-" + r.k, key: r.k, name: r.n + " · " + r.name, counties: r.c, n: r.n }; });
   var distOf = {}; DIST.forEach(function (d) { d.counties.forEach(function (c) { distOf[c] = d.code; }); });
   DIST.forEach(function (d) { chip({ code: d.code, name: d.name }, "abbrDistricts"); });
   var mapEls = {}, lblEls = {};
@@ -1029,7 +1043,7 @@ render();
     var NS = "http://www.w3.org/2000/svg", sums = {};
     list.forEach(function (c) {
       var code = metroOf[c.name], path = document.createElementNS(NS, "path");
-      var dk = distOf[c.name] ? distOf[c.name].replace("us-in-", "") : "", dn = dk ? DISTRICTS[dk].n : 0;
+      var dd = DIST.filter(function (d) { return d.counties.indexOf(c.name) >= 0; })[0], dn = dd ? dd.n : 0;
       path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : "") + (dn ? " d" + dn : ""));
       var t = document.createElementNS(NS, "title"); t.textContent = c.name + " County · " + (code ? code : "no metro") + (distOf[c.name] ? " · " + distOf[c.name] : ""); path.appendChild(t);
       path.classList.add("pick");
