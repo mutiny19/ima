@@ -45,7 +45,9 @@
 .abbr-mapbox .cty { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
 .abbr-mapbox .cty.metro { fill: var(--signal-soft); cursor: pointer; }
 .abbr-mapbox .cty.metro:hover { stroke: var(--beacon); stroke-width: 1.5; }
+.abbr-mapbox .cty.metro.near { fill: var(--signal-soft); fill-opacity: .45; }
 .abbr-mapbox .cty.metro.on { fill: var(--beacon); }
+.abbr-mapbox .cty.metro.near.on { fill: var(--beacon); fill-opacity: .7; }
 .abbr-mapbox .lbl { font: 700 15px/1 var(--mono); fill: var(--fg); pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
 .abbr-mapbox .lbl.on { fill: #13201C; stroke: var(--beacon); }
 .abbr-mapbox .city { font: 500 10px/1 var(--body); fill: var(--muted); pointer-events: none; text-anchor: middle; }
@@ -235,7 +237,7 @@
     <div class="abbr-grid">
       <div class="panel abbr-map-panel">
         <h3>Click the area your repeater serves</h3>
-        <p class="sub">Each shaded area is one airport code. Click to add it, click again to remove. Unshaded counties carry <code>us</code> and <code>us-in</code> only.</p>
+        <p class="sub">Every county belongs to one airport code: its metro area where it has one, otherwise the nearest major airport (lighter shading), which for the southeast corner is Cincinnati or Louisville. Click an area to add it, click again to remove.</p>
         <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
       </div>
       <div class="panel">
@@ -246,7 +248,7 @@
           <button type="button" class="chip all" id="abbrAll" aria-pressed="false">Open Indiana Mesh: all areas</button>
           <button type="button" class="chip" id="abbrClear">Clear</button>
         </div>
-        <p class="note">"Open Indiana Mesh" carries every Indiana area code, so scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 11 tags, well inside the budget.</p>
+        <p class="note">"Open Indiana Mesh" carries every area code that covers part of Indiana, including <code>cvg</code> and <code>sdf</code> for the counties whose nearest airport is across the river, so scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 13 tags, well inside the budget.</p>
         <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them yet; using one is a proposal, and it only matters once a second repeater carries it.</p>
         <h3>Near a border?</h3>
         <p class="sub">Add a neighbouring group's own tags, spelled exactly as they publish them. Each one only lets more scoped traffic through.</p>
@@ -938,7 +940,8 @@ render();
     { code: "ind", name: "Indianapolis", pub: true }, { code: "fwa", name: "Fort Wayne", pub: true },
     { code: "sbn", name: "South Bend", pub: true }, { code: "evv", name: "Evansville", pub: true },
     { code: "laf", name: "Lafayette" }, { code: "bmg", name: "Bloomington" }, { code: "huf", name: "Terre Haute" },
-    { code: "mie", name: "Muncie" }, { code: "gyy", name: "Gary / NW Indiana" }
+    { code: "mie", name: "Muncie" }, { code: "gyy", name: "Gary / NW Indiana" },
+    { code: "cvg", name: "Cincinnati side (SE Indiana)", pub: true }, { code: "sdf", name: "Louisville side (S Indiana)", pub: true }
   ];
   var NEIGHBORS = [
     { code: "oki", name: "OKI Mesh (Cincinnati tri-state)" }, { code: "us-midwest", name: "OKI meta region" },
@@ -955,7 +958,9 @@ render();
     bmg: { cities: ["Bloomington"], counties: ["Monroe", "Owen", "Greene", "Lawrence"] },
     huf: { cities: ["Terre Haute"], counties: ["Vigo", "Clay", "Sullivan", "Vermillion", "Parke"] },
     mie: { cities: ["Muncie"], counties: ["Delaware", "Jay", "Randolph", "Blackford"] },
-    gyy: { cities: ["Gary", "Hammond", "Merrillville", "Valparaiso", "Crown Point", "Michigan City"], counties: ["Lake", "Porter", "LaPorte", "Jasper", "Newton"] }
+    gyy: { cities: ["Gary", "Hammond", "Merrillville", "Valparaiso", "Crown Point", "Michigan City"], counties: ["Lake", "Porter", "LaPorte", "Jasper", "Newton"] },
+    cvg: { cities: ["Lawrenceburg", "Aurora", "Batesville", "Brookville"], counties: ["Dearborn", "Franklin", "Ohio", "Union"] },
+    sdf: { cities: ["Jeffersonville", "New Albany", "Clarksville", "Sellersburg", "Corydon"], counties: ["Clark", "Floyd", "Harrison", "Scott", "Washington"] }
   };
   function chanName(s) { return "#" + s.toLowerCase().replace(/[^a-z]/g, ""); }
   function chanChip(name, host) {
@@ -971,8 +976,21 @@ render();
     names.forEach(function (n) { chanChip(n, host); });
   }
   var sel = {};
-  var metroOf = {};
+  /* Every county belongs to one area: its metro statistical area where it has one, otherwise the nearest of the nine airports.
+     That is the convention applied literally, so the whole state is covered and "all areas" means all of Indiana. */
+  var ANCHOR = { ind: "Marion", fwa: "Allen", sbn: "St. Joseph", evv: "Vanderburgh", laf: "Tippecanoe", bmg: "Monroe", huf: "Vigo", mie: "Delaware", gyy: "Lake", cvg: "Dearborn", sdf: "Clark" };
+  var metroOf = {}, inferred = {};
   Object.keys(PLACES).forEach(function (code) { PLACES[code].counties.forEach(function (c) { metroOf[c] = code; }); });
+  (function assignRest() {
+    var list = []; try { list = COUNTIES.filter(function (c) { return c.st === "IN"; }); } catch (e) { return; }
+    var anchors = {}; list.forEach(function (c) { Object.keys(ANCHOR).forEach(function (code) { if (ANCHOR[code] === c.name) anchors[code] = c; }); });
+    list.forEach(function (c) {
+      if (metroOf[c.name]) return;
+      var best = null, bd = Infinity;
+      Object.keys(anchors).forEach(function (code) { var a = anchors[code], d = (a.cx - c.cx) * (a.cx - c.cx) + (a.cy - c.cy) * (a.cy - c.cy); if (d < bd) { bd = d; best = code; } });
+      if (best) { metroOf[c.name] = best; inferred[c.name] = true; }
+    });
+  })();
   var mapEls = {}, lblEls = {};
   (function drawMap() {
     var svg = $("abbrMap"); if (!svg) return;
@@ -980,13 +998,15 @@ render();
     var NS = "http://www.w3.org/2000/svg", sums = {};
     list.forEach(function (c) {
       var code = metroOf[c.name], path = document.createElementNS(NS, "path");
-      path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : ""));
-      var t = document.createElementNS(NS, "title"); t.textContent = c.name + " County" + (code ? " · " + code : " · us, us-in only"); path.appendChild(t);
+      path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : "") + (inferred[c.name] ? " near" : ""));
+      var t = document.createElementNS(NS, "title"); t.textContent = c.name + " County · " + code + (inferred[c.name] ? " (nearest airport)" : ""); path.appendChild(t);
       if (code) { path.addEventListener("click", function () { sel[code] = !sel[code]; syncChips(); renderAbbr(); }); (mapEls[code] = mapEls[code] || []).push(path); var sm = sums[code] = sums[code] || { x: 0, y: 0, n: 0 }; sm.x += c.cx; sm.y += c.cy; sm.n++; }
       svg.appendChild(path);
     });
     Object.keys(sums).forEach(function (code) {
       var sm = sums[code], l = document.createElementNS(NS, "text");
+      /* label sits on the anchor county, not the centroid of the whole area */
+      var a = list.filter(function (c) { return c.name === ANCHOR[code]; })[0]; if (a) { sm.x = a.cx * sm.n; sm.y = a.cy * sm.n; }
       l.setAttribute("x", (sm.x / sm.n).toFixed(1)); l.setAttribute("y", (sm.y / sm.n + 5).toFixed(1)); l.setAttribute("class", "lbl"); l.textContent = code; svg.appendChild(l); lblEls[code] = l;
     });
   })();
