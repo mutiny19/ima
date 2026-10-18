@@ -252,12 +252,49 @@
     <p class="sub">Click the county your repeater sits in, then every county it reaches. Everything is optional: with nothing selected the output is exactly Phase 1.</p>
   </header>
   <div class="mode" role="group" aria-label="Choose a scoping style">
-    <button type="button" class="mode-btn" id="modeAbbr" aria-pressed="true">Abbreviated</button>
+    <button type="button" class="mode-btn" id="modeSimple" aria-pressed="true">Simplest</button>
+    <button type="button" class="mode-btn" id="modeAbbr" aria-pressed="false">Abbreviated</button>
     <button type="button" class="mode-btn" id="modeFull" aria-pressed="false">County &amp; district</button>
-    <span class="mode-help">Two ways to tag a repeater. <strong>Abbreviated</strong> uses only tags other groups already carry; you could guess them from the convention. <strong>County &amp; district</strong> is the full builder, with Indiana's own county and district tags.</span>
+    <span class="mode-help">Three ways to tag a repeater. <strong>Simplest</strong>: pick an airport and a third of the state, done. <strong>Abbreviated</strong>: the same tags, chosen on a map by metro and region, with neighbours. <strong>County &amp; district</strong>: the full builder, with Indiana's own county and district tags.</span>
   </div>
 
-  <section id="abbr" class="abbr" aria-labelledby="abbr-h">
+  <section id="simple" class="abbr" aria-labelledby="simple-h">
+    <h2 id="simple-h">Simplest scoping</h2>
+    <p class="sub">Two picks. Every repeater carries <code>us</code> and <code>us-in</code>; you add the airport code of the metro it serves, and which third of the state it sits in. The third is shorthand for the Visit Indiana regions it contains, so the tags are the same ones the Abbreviated mode produces and the two never disagree.</p>
+    <section class="panel step" aria-labelledby="s1-h">
+      <h3 id="s1-h"><span class="stepnum">1</span> Airport</h3>
+      <p class="sub">The lowercase code of the nearest metro's main airport. Skip it for a rural repeater away from every metro.</p>
+      <div class="chips" id="simpleMetros"></div>
+    </section>
+    <section class="panel step" aria-labelledby="s2-h">
+      <h3 id="s2-h"><span class="stepnum">2</span> Where in the state</h3>
+      <p class="sub">Pick one. Each is the closest combination of Visit Indiana regions, and the code carries those region tags.</p>
+      <div class="chips" id="simpleBands"></div>
+      <p class="note" id="simpleBandNote"></p>
+    </section>
+    <section class="panel step" aria-labelledby="s3-h">
+      <div class="head"><h3 id="s3-h"><span class="stepnum">3</span> Get the code</h3><button class="copy" type="button" id="simpleCopy">Copy</button></div>
+      <label class="k" for="simpleFw">Firmware</label>
+      <select id="simpleFw">
+        <option value="1.16">1.16 or newer (region def)</option>
+        <option value="1.15">1.15 or openHop (region put)</option>
+        <option value="1.14">1.14 and older (region put + allowf)</option>
+      </select>
+      <pre id="simpleOut"></pre>
+      <p class="note" id="simpleBudget"></p>
+      <p class="note">Run them on the repeater over USB serial or the app's remote admin, <strong>one line at a time</strong>, then <code>region list allowed</code> should show <code>*</code> plus every tag. Near a state line, or for a repeater between two metros, switch to <strong>Abbreviated</strong> for neighbours and a second metro.</p>
+    </section>
+    <section class="method" aria-labelledby="simple-method-h">
+      <h3 id="simple-method-h">Method</h3>
+      <ol>
+        <li><strong>Base tags.</strong> <code>us</code> and <code>us-in</code>, with <code>region allowf *</code> and no default region, so unscoped traffic keeps flowing.</li>
+        <li><strong>Airport.</strong> The same metro codes as the Abbreviated mode: <em>published</em> ones from <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh's region list</a> and the observer services, the rest by the same convention.</li>
+        <li><strong>Thirds.</strong> North is the Northwest, North Central, Northeast, and Wabash Valley regions of the <a href="https://visitindiana.in.gov/regions/" target="_blank" rel="noopener">Visit Indiana map</a>; Central is West-Central, Central, and East Central; South is South Central, Southwest, Southeast, and South. A third is not a tag of its own: the code carries its regions' tags (<code>us-in-nw</code> and so on), so a message scoped to any region in that third passes the repeater, and a repeater set up in Abbreviated mode matches it exactly.</li>
+        <li><strong>Commands and limits.</strong> As in the Abbreviated mode: the flat <code>region def</code> form on 1.16 and newer, <code>region put</code> per tag on 1.15 and openHop, plus <code>region allowf</code> on 1.14; 32 slots and 172 Discover Regions bytes, from the firmware source.</li>
+      </ol>
+    </section>
+  </section>
+  <section id="abbr" class="abbr" aria-labelledby="abbr-h" hidden>
     <h2 id="abbr-h">Abbreviated scoping</h2>
     <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
     <section class="panel step" aria-labelledby="step1-h">
@@ -1151,13 +1188,49 @@ render();
   });
   renderAbbr();
   /* mode switch */
-  var A = $("modeAbbr"), F = $("modeFull"), abbr = $("abbr"), full = $("fullBuilder");
+  /* Simplest mode: one airport, one third of the state (a shorthand for Visit Indiana regions). */
+  var BANDS = [
+    { key: "north", name: "Northern Indiana", regions: ["nw", "nc", "ne", "wv"] },
+    { key: "central", name: "Central Indiana", regions: ["wc", "cen", "ec"] },
+    { key: "south", name: "Southern Indiana", regions: ["sc", "sw", "se", "s"] }
+  ];
+  var sMetro = null, sBand = null;
+  function sChip(host, def, label, small) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "chip" + (def.pub === false || (host === "simpleMetros" && !def.pub) ? " conv" : "");
+    b.dataset.code = def.code; b.setAttribute("aria-pressed", "false"); b.innerHTML = "<b>" + label + "</b>" + (small ? "<small>" + small + "</small>" : "");
+    $(host).appendChild(b); return b;
+  }
+  METROS.forEach(function (m) { sChip("simpleMetros", m, m.code, m.name).addEventListener("click", function () { sMetro = sMetro === m.code ? null : m.code; renderSimple(); }); });
+  BANDS.forEach(function (bd) { sChip("simpleBands", { code: bd.key, pub: true }, bd.name, bd.regions.map(function (k) { return "us-in-" + k; }).join(" ")).addEventListener("click", function () { sBand = sBand === bd.key ? null : bd.key; renderSimple(); }); });
+  function renderSimple() {
+    var t = ["us", "us-in"]; if (sMetro) t.push(sMetro);
+    var bd = BANDS.filter(function (b) { return b.key === sBand; })[0];
+    if (bd) bd.regions.forEach(function (k) { t.push("us-in-" + k); });
+    document.querySelectorAll("#simpleMetros .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.code === sMetro)); });
+    document.querySelectorAll("#simpleBands .chip").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.code === sBand)); });
+    var fw = $("simpleFw").value, lines = [];
+    if (fw === "1.16") lines.push("region def " + t.map(function (x, i) { return i < t.length - 1 ? x + "|*" : x; }).join(" "));
+    else { t.forEach(function (x) { lines.push("region put " + x); }); if (fw === "1.14") t.forEach(function (x) { lines.push("region allowf " + x); }); }
+    lines.push("region allowf *", "region save", "region list allowed");
+    $("simpleOut").textContent = lines.join("\n");
+    $("simpleBudget").textContent = t.length + " of 32 region slots · about " + t.join(",").length + " of 172 Discover Regions bytes";
+    $("simpleBandNote").textContent = bd ? bd.name + " adds " + bd.regions.map(function (k) { return "us-in-" + k; }).join(", ") + "." : "No third picked: the repeater carries only us, us-in" + (sMetro ? ", and " + sMetro : "") + ".";
+  }
+  $("simpleFw").addEventListener("change", renderSimple);
+  $("simpleCopy").addEventListener("click", function () {
+    var text = $("simpleOut").textContent, b = $("simpleCopy");
+    function done() { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1400); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, done); else done();
+  });
+  renderSimple();
+
+  var S = $("modeSimple"), A = $("modeAbbr"), F = $("modeFull"), simple = $("simple"), abbr = $("abbr"), full = $("fullBuilder");
   function mode(m) {
-    var isA = m !== "full";
-    A.setAttribute("aria-pressed", String(isA)); F.setAttribute("aria-pressed", String(!isA));
-    abbr.hidden = !isA; full.hidden = isA;
-    try { localStorage.setItem("ioc-scope-mode", isA ? "abbr" : "full"); } catch (e) {}
-    if (!isA) window.dispatchEvent(new Event("resize"));
+    if (m !== "full" && m !== "abbr") m = "simple";
+    S.setAttribute("aria-pressed", String(m === "simple")); A.setAttribute("aria-pressed", String(m === "abbr")); F.setAttribute("aria-pressed", String(m === "full"));
+    simple.hidden = m !== "simple"; abbr.hidden = m !== "abbr"; full.hidden = m !== "full";
+    try { localStorage.setItem("ioc-scope-mode", m); } catch (e) {}
+    if (m === "full") window.dispatchEvent(new Event("resize"));
   }
   /* County & district mode: channel names for the counties picked on the map, without touching the builder */
   /* The builder's render() and state live in the shared global scope of the earlier classic script. */
@@ -1178,10 +1251,11 @@ render();
     };
     try { render(); } catch (e) {}
   }
+  S.addEventListener("click", function () { mode("simple"); });
   A.addEventListener("click", function () { mode("abbr"); });
   F.addEventListener("click", function () { mode("full"); });
   var saved = null; try { saved = localStorage.getItem("ioc-scope-mode"); } catch (e) {}
-  mode(saved === "full" ? "full" : "abbr");
+  mode(saved);
 })();
 </script>
 <script>
