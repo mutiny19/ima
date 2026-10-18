@@ -43,13 +43,17 @@
 .abbr-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
 .abbr-mapbox svg { width: 100%; height: auto; display: block; }
 .abbr-mapbox .cty { fill: var(--panel); stroke: var(--line); stroke-width: 1; }
+.abbr-mapbox .cty.d1 { fill: var(--d1); } .abbr-mapbox .cty.d2 { fill: var(--d2); } .abbr-mapbox .cty.d3 { fill: var(--d3); } .abbr-mapbox .cty.d4 { fill: var(--d4); } .abbr-mapbox .cty.d5 { fill: var(--d5); }
+.abbr-mapbox .cty.d6 { fill: var(--d6); } .abbr-mapbox .cty.d7 { fill: var(--d7); } .abbr-mapbox .cty.d8 { fill: var(--d8); } .abbr-mapbox .cty.d9 { fill: var(--d9); } .abbr-mapbox .cty.d10 { fill: var(--d10); }
+.abbr-mapbox .cty.dist:not(.metro) { fill: var(--beacon); fill-opacity: .45; }
 .abbr-mapbox .cty.metro { fill: var(--signal-soft); cursor: pointer; }
 .abbr-mapbox .cty.metro:hover { stroke: var(--beacon); stroke-width: 1.5; }
 .abbr-mapbox .cty.pick { cursor: pointer; }
 .abbr-mapbox .cty.pick:hover { stroke: var(--beacon); stroke-width: 1.5; }
 .abbr-mapbox .cty.metro.on { fill: var(--beacon); }
 .abbr-mapbox .cty.metro.near.on { fill: var(--beacon); fill-opacity: .7; }
-.abbr-mapbox .cty.dist { stroke: var(--fg); stroke-width: 2.2; }
+.abbr-mapbox .cty.dist { stroke: var(--fg); stroke-width: 1.8; }
+.abbr-mapbox .dnum { font: 500 11px/1 var(--mono); fill: var(--muted); pointer-events: none; text-anchor: middle; }
 .abbr-mapbox .dlbl { font: 700 13px/1 var(--mono); fill: var(--fg); pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
 .abbr-mapbox .lbl { font: 700 15px/1 var(--mono); fill: var(--fg); pointer-events: none; text-anchor: middle; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
 .abbr-mapbox .lbl.on { fill: #13201C; stroke: var(--beacon); }
@@ -239,8 +243,8 @@
     <p class="sub">The convention, in one sentence: <strong>every repeater carries <code>us</code> and its state as <code>us-in</code>, plus the lowercase three-letter airport code of each metro it serves.</strong> That's it. No default region, unscoped traffic allowed. The same three tags OKI Mesh, Waev, MeshMapper, and the observer firmwares already use for Indiana, so a guess lands on what your neighbours carry.</p>
     <div class="abbr-grid">
       <div class="panel abbr-map-panel">
-        <h3>Click the area your repeater serves</h3>
-        <p class="sub">Shaded counties belong to a metro airport code; click one to add that code. Unshaded counties have no metro: clicking one adds its IDHS district instead, outlined on the map. Click again to remove.</p>
+        <h3>Click the metro or district your repeater serves</h3>
+        <p class="sub">The map is tinted by district (numbered) with the metro areas shaded on top. Click a metro county to add its airport code; click any other county to add its district. Click again to remove.</p>
         <div class="abbr-mapbox"><svg id="abbrMap" viewBox="30 85 470 712" role="group" aria-label="Indiana metro areas by airport code"></svg></div>
       </div>
       <div class="panel">
@@ -253,8 +257,8 @@
         </div>
         <p class="note">"Open Indiana Mesh" carries every metro code that covers part of Indiana, including <code>cvg</code> and <code>sdf</code> for the counties OKI lists in the Cincinnati and Louisville metros, so metro-scoped traffic from anywhere in the state passes through this repeater. Good for backbone and high sites; 13 tags, well inside the budget. Add districts separately if you want district-scoped traffic too.</p>
         <p class="note"><span class="pub">Published</span> codes appear in OKI Mesh's region list or an observer service's region list. <span class="conv">By convention</span> codes follow the same rule but no group has published them yet; using one is a proposal, and it only matters once a second repeater carries it.</p>
-        <h3>IDHS district (optional)</h3>
-        <p class="sub">Indiana's ten homeland-security districts, from the <a href="https://www.in.gov/dhs/files/IDHS-Districts-Map.pdf" target="_blank" rel="noopener">IDHS district map</a>. Convention: <code>in-d</code> plus the district number, so district 5 is <code>in-d5</code>. Useful for emergency-management traffic that follows district lines. No group publishes these yet.</p>
+        <h3>Districts</h3>
+        <p class="sub">The same ten districts as the County &amp; district builder, with the same tags, so the two modes never disagree: <code>us-in-</code> plus the district's short code (<code>nw</code>, <code>nc</code>, <code>ne</code>, <code>wc</code>, <code>cen</code>, <code>ec</code>, <code>w</code>, <code>sc</code>, <code>se</code>, <code>sw</code>). Districts fill in the counties no metro covers; pick a district, a metro, or both. No group publishes these yet.</p>
         <div class="chips" id="abbrDistricts"></div>
         <h3>Near a border?</h3>
         <p class="sub">Add a neighbouring group's own tags, spelled exactly as they publish them. Each one only lets more scoped traffic through.</p>
@@ -984,7 +988,7 @@ render();
   var sel = {};
   var metroOf = {}, inferred = {};
   Object.keys(PLACES).forEach(function (code) { PLACES[code].counties.forEach(function (c) { metroOf[c] = code; }); });
-  var DIST = []; try { DIST = Object.keys(DISTRICTS).map(function (k) { return { code: "in-d" + DISTRICTS[k].n, name: DISTRICTS[k].n + " " + DISTRICTS[k].name, counties: DISTRICTS[k].c, n: DISTRICTS[k].n }; }).sort(function (a, b) { return a.n - b.n; }); } catch (e) {}
+  var DIST = []; try { DIST = Object.keys(DISTRICTS).map(function (k) { return { code: "us-in-" + k, key: k, name: DISTRICTS[k].n + " · " + DISTRICTS[k].name, counties: DISTRICTS[k].c, n: DISTRICTS[k].n }; }).sort(function (a, b) { return a.n - b.n; }); } catch (e) {}
   var distOf = {}; DIST.forEach(function (d) { d.counties.forEach(function (c) { distOf[c] = d.code; }); });
   DIST.forEach(function (d) { chip({ code: d.code, name: d.name }, "abbrDistricts"); });
   var mapEls = {}, lblEls = {};
@@ -994,12 +998,17 @@ render();
     var NS = "http://www.w3.org/2000/svg", sums = {};
     list.forEach(function (c) {
       var code = metroOf[c.name], path = document.createElementNS(NS, "path");
-      path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : "") + (inferred[c.name] ? " near" : ""));
+      var dk = distOf[c.name] ? distOf[c.name].replace("us-in-", "") : "", dn = dk ? DISTRICTS[dk].n : 0;
+      path.setAttribute("d", c.d); path.setAttribute("class", "cty" + (code ? " metro" : "") + (dn ? " d" + dn : ""));
       var t = document.createElementNS(NS, "title"); t.textContent = c.name + " County · " + (code ? code : "no metro") + (distOf[c.name] ? " · " + distOf[c.name] : ""); path.appendChild(t);
       path.classList.add("pick");
       path.addEventListener("click", function () { var k = code || distOf[c.name]; if (!k) return; sel[k] = !sel[k]; syncChips(); renderAbbr(); });
       if (code) { (mapEls[code] = mapEls[code] || []).push(path); var sm = sums[code] = sums[code] || { x: 0, y: 0, n: 0 }; sm.x += c.cx; sm.y += c.cy; sm.n++; }
       svg.appendChild(path);
+    });
+    DIST.forEach(function (d) {
+      var xs = 0, ys = 0, n = 0; list.forEach(function (c) { if (d.counties.indexOf(c.name) >= 0) { xs += c.cx; ys += c.cy; n++; } });
+      if (!n) return; var t = document.createElementNS(NS, "text"); t.setAttribute("x", (xs / n).toFixed(1)); t.setAttribute("y", (ys / n - 14).toFixed(1)); t.setAttribute("class", "dnum"); t.textContent = String(d.n); svg.appendChild(t);
     });
     Object.keys(sums).forEach(function (code) {
       var sm = sums[code], l = document.createElementNS(NS, "text");
