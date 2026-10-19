@@ -18,6 +18,7 @@ EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 CALLSIGN = re.compile(r"\b[AKNW][A-Z]?[0-9][A-Z]{1,3}\b")
 ALLOW = {
     "41898283+github-actions[bot]@users.noreply.github.com",
+    "mutiny19@users.noreply.github.com",  # the organization's GitHub no-reply address, used as commit author
     "W7VMI",  # club callsign of Vashon Island's ARC, cited in the agencies article
 }
 TEXT = (".html", ".md", ".yml", ".yaml", ".py", ".js", ".css", ".json", ".txt", ".svg")
