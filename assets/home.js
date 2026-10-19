@@ -265,11 +265,11 @@
     { id: "gmrs", name: "GMRS", tagline: "Licensed UHF voice radio with repeaters.", meta: "$35 license, no exam · Voice", status: "Quick reference · reviewed 2026-10-15",
       note: "The calling channel and tone are community conventions, not FCC rules.",
       rows: [["Calling / travel", "Ch 20 · 141.3 Hz"], ["Repeater channels", "15 to 22"], ["Station ID", "Every 15 min and at the end"]],
-      links: [["FCC: GMRS and licensing", "fcc.gov", "https://www.fcc.gov/general-mobile-radio-service-gmrs"], ["The rules", "47 CFR Part 95, Subpart E", "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-D/part-95/subpart-E"], ["Repeater directory", "myGMRS", "https://mygmrs.com"]] },
+      links: [["FCC: GMRS and licensing", "fcc.gov", "https://www.fcc.gov/general-mobile-radio-service-gmrs"], ["The rules", "47 CFR Part 95, Subpart E", "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-D/part-95/subpart-E"], ["Repeater directory", "myGMRS", "https://mygmrs.com"], ["Indianapolis metro net card", "PDF, nets and channels for a handheld", "resources/indy-metro-net-card.pdf"]] },
     { id: "ham", name: "Ham radio", tagline: "Licensed amateur radio. Indiana clubs set local practice.", meta: "FCC exam · Voice, data", status: "Links only",
       note: "National calling frequencies. Local practice comes from Indiana clubs.",
       rows: [["2 m simplex calling", "146.520 MHz"], ["70 cm simplex calling", "446.000 MHz"], ["Repeater coordination", "Indiana Repeater Council"], ["Emergency service", "ARES, ARRL Indiana Section"]],
-      links: [["ARRL: getting licensed", "arrl.org", "https://www.arrl.org/getting-licensed"], ["Find an Indiana club", "ARRL club search", "https://www.arrl.org/find-a-club"], ["ARRL Indiana Section", "arrl.org", "https://www.arrl.org/sections/view/indiana"], ["Repeater directory", "RepeaterBook", "https://www.repeaterbook.com"]] },
+      links: [["ARRL: getting licensed", "arrl.org", "https://www.arrl.org/getting-licensed"], ["Find an Indiana club", "ARRL club search", "https://www.arrl.org/find-a-club"], ["ARRL Indiana Section", "arrl.org", "https://www.arrl.org/sections/view/indiana"], ["Repeater directory", "RepeaterBook", "https://www.repeaterbook.com"], ["Indianapolis metro net card", "PDF, nets and channels for a handheld", "resources/indy-metro-net-card.pdf"]] },
     { id: "meshcore", name: "MeshCore", tagline: "LoRa text mesh built around fixed repeaters.", meta: "No license · Text · 915 MHz", status: "Radio: official MeshCore {PN} preset · reviewed 2026-10-19",
       views: {
         companion: {
