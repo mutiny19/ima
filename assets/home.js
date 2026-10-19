@@ -270,7 +270,7 @@
       note: "National calling frequencies. Local practice comes from Indiana clubs.",
       rows: [["2 m simplex calling", "146.520 MHz"], ["70 cm simplex calling", "446.000 MHz"], ["Repeater coordination", "Indiana Repeater Council"], ["Emergency service", "ARES, ARRL Indiana Section"]],
       links: [["ARRL: getting licensed", "arrl.org", "https://www.arrl.org/getting-licensed"], ["Find an Indiana club", "ARRL club search", "https://www.arrl.org/find-a-club"], ["ARRL Indiana Section", "arrl.org", "https://www.arrl.org/sections/view/indiana"], ["Repeater directory", "RepeaterBook", "https://www.repeaterbook.com"]] },
-    { id: "meshcore", name: "MeshCore", tagline: "LoRa text mesh built around fixed repeaters.", meta: "No license · Text · 915 MHz", status: "Radio: official MeshCore {PN} preset · regions: Indiana region settings",
+    { id: "meshcore", name: "MeshCore", tagline: "LoRa text mesh built around fixed repeaters.", meta: "No license · Text · 915 MHz", status: "Radio: official MeshCore {PN} preset · reviewed 2026-10-19",
       views: {
         companion: {
           label: "Companion",
@@ -285,7 +285,7 @@
         },
         repeater: {
           label: "Repeater",
-          note: "Radio: MeshCore's official {PN} preset, read live. The other values are Indiana's starting point; the MeshCore CLI reference explains each one. Regions: the six starting tags below, built out on the Indiana region settings page.",
+          note: "Radio: MeshCore's official {PN} preset, read live. The other values are Indiana's starting point; the MeshCore CLI reference explains each one. Regions: nothing required; Indiana's proposals are on the Advanced page.",
           copyAll: "set radio {RC}\nset path.hash.mode 1\nset advert.interval 0\nset flood.advert.interval 47\nregion def us us-in|us us-oh|us us-ky|us us-mi|us us-il\nregion allowf *\nregion save",
           copyAllNote: "Copy all is for firmware 1.16 and newer. Copy multi.acks and your name separately; edit the name first.",
           alts: [
@@ -299,29 +299,21 @@
             ["Path hash mode", "1 (2-byte)", "set path.hash.mode 1", null, true],
             ["Zero-hop advert", "0 (off)", "set advert.interval 0"],
             ["Flood advert", "every 47 h", "set flood.advert.interval 47"],
-            ["Regions", "us us-in us-oh us-ky us-mi us-il", "region def us us-in|us us-oh|us us-ky|us us-mi|us us-il", null, true],
-            ["Unscoped traffic", "Allowed", "region allowf *"],
-            ["Save regions", "After any region change", "region save"],
             ["multi.acks", "1 rural · 0 urban", "set multi.acks 1"],
-            ["Name", "IN.<CTY>.<name> (edit before sending)", "set name IN.CTY.name"]
+            ["Regions", "Nothing required. Indiana's proposals, and the open-base commands, are on the Advanced page"]
           ]
         },
         observer: {
           label: "Observer",
-          note: "An observer is a repeater or spare radio with an internet connection that uploads the packets it hears, so Indiana shows up on the live maps. It changes nothing about how messages route. Indiana's preferred service is Waev, chosen for its documented privacy model; the others are listed so one observer can feed several at once. MeshCore's own FAQ answers how to make a repeater an observer; broker details for all of these, and step-by-step setup for each tool, are on the Waev connect page and OKI's broker page. All three are linked on the right.",
+          note: "An observer is a repeater or spare radio with an internet connection that uploads the packets it hears, so Indiana shows up on the live maps. It changes nothing about how messages route. MeshCore's own FAQ explains how to set one up; broker details for every service are on the Advanced page.",
           rows: [
             ["Radio preset", "{PN}: {R}, the same as everyone"],
-            ["Preferred: Waev", "Privacy-minded by design: opted-out nodes dropped at ingest, personal radios never identified, no derived locations. WebSockets + TLS; signs in with the node's own MeshCore auth token, no password", "mqtt.waev.app:443"],
-            ["Also: OKI CoreScope", "The regional alliance's analyzer, a good second feed · plain TCP, anonymous · topic prefix meshcore", "mqtt1.okimesh.org:1883"],
-            ["Also: LetsMesh US", "Shared packet analyzer · WebSockets + TLS · auth token", "wss://mqtt-us-v1.letsmesh.net:443/mqtt"],
-            ["Also: MeshMapper", "Coverage and live maps for Indianapolis and Fort Wayne · WebSockets + TLS · auth token", "wss://mqtt.meshmapper.net:443/mqtt"],
-            ["Ways to run one", "openHop repeater with the Waev Outpost plugin · Offband observer firmware on an ESP32 radio · meshcoretomqtt on a Pi · MeshCore Home Assistant integration"],
-            ["Verify", "Send a flood advert from the radio; within a few minutes it should show on the Waev live map"],
-            ["Opting out", "Any node whose name contains ⛔ 🛑 or 🚫 is dropped by Waev before anything is written"]
+            ["How", "MeshCore FAQ: make your repeater an observer (linked below under Official docs)"],
+            ["Where it reports", "Waev (mqtt.waev.app:443) is Indiana's preferred service for its documented privacy model; OKI CoreScope, LetsMesh, and MeshMapper are listed on the Advanced page"]
           ]
         }
       },
-      links: [["Get on the Indiana mesh", "Five-step start", "meshcore/"], ["Indiana region settings", "repeater owners", "advanced/"], ["MeshCore FAQ: make your repeater an observer", "docs.meshcore.io", "https://docs.meshcore.io/faq/#38-q-how-do-i-make-my-repeater-an-observer-on-the-mesh"], ["Connect an observer", "waev.app, all tools", "https://waev.app/#/connect"], ["OKI CoreScope broker settings", "docs.okimesh.org", "https://docs.okimesh.org/books/meshcore-I9o/page/mqtt-broker-settings"], ["Live views", "Waev, CoreScope, MeshMapper, the map", "live/"], ["Official docs", "docs.meshcore.io", "https://docs.meshcore.io/"], ["MeshCore Map", "map.meshcore.io", "https://map.meshcore.io"], ["Web flasher", "flasher.meshcore.io", "https://flasher.meshcore.io/"], ["Source", "meshcore-dev/MeshCore", "https://github.com/meshcore-dev/MeshCore"]] },
+      links: [["Official docs and FAQ", "docs.meshcore.io", "https://docs.meshcore.io/"], ["Web flasher", "flasher.meshcore.io", "https://flasher.meshcore.io/"], ["MeshCore Map", "map.meshcore.io", "https://map.meshcore.io"]] },
     { id: "meshtastic", name: "Meshtastic", tagline: "LoRa text mesh where every node can relay.", meta: "No license · Text · 915 MHz · Few Indiana users today", status: "Defaults · few Indiana users",
       note: "Few active users in Indiana right now. The stock defaults work here; if you run it, report yours below so it's counted.",
       rows: [["Region", "US"], ["Modem preset", "LongFast (default)"], ["Primary channel", "LongFast (default)"], ["MQTT", "Off by default"]],

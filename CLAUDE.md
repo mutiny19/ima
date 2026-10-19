@@ -28,8 +28,8 @@ group's own pages, and it only publishes Indiana-specific suggestions as proposa
 | Path | What |
 |---|---|
 | `index.html` + `assets/home.js` | Home: map band (repeaters, NWS alerts, nets, Kp), dashboard, settings accordion, report form |
-| `meshcore/index.html` | Start page: first radio to first message, nearby groups table |
-| `advanced/index.html` | Region settings: three proposed structures (Simplest, Abbreviated, County & district) |
+| `meshcore/index.html` | Start page: first radio to first message, nearby groups table. Keep it simple and close to the official docs |
+| `advanced/index.html` | Advanced and theoretical: three proposed region structures, open base commands, neighbours' tags, observer brokers. Everything Indiana-specific for repeater owners goes here, not on the main pages |
 | `advanced/regions.js` | **Every table the region page draws from**: metro codes, regions, districts, neighbours, bands |
 | `advanced/counties.js` | County outlines for the maps (generated from Census data) |
 | `advanced/builder.js` | County & district builder logic |
@@ -46,6 +46,10 @@ Scripts are classic (non-module) and share globals in load order, so `regions.js
 before `builder.js` and `modes.js`.
 
 ## Changing things
+
+- The main pages (home, start page) stay simple: a few official links per protocol, no regional conventions.
+  Anything Indiana-specific or undecided for repeater owners goes on `advanced/`.
+
 
 - Site name, Discord invite, repo URL: they appear in the header and footer of every page.
   `grep -rl "discord.gg" --include=*.html .` finds them all; `FORKING.md` has the checklist.

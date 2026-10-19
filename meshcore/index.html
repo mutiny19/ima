@@ -150,6 +150,7 @@ details.depth[open] { padding-bottom: 18px; }
     <button type="button" class="nav-menu" id="navMenu" aria-expanded="false" aria-controls="navMore">Menu</button>
     <span class="nav-more" id="navMore">
       <a href="../#protocols">Settings</a>
+      <a href="../advanced/">Advanced</a>
       <a href="../live/">Live</a>
       <a href="../emergency/">Agencies</a>
       <a href="../#report">Report</a>
@@ -171,7 +172,7 @@ details.depth[open] { padding-bottom: 18px; }
     <h1>Get on the Indiana mesh</h1>
     <p class="lead">From a new radio to your first message in five steps. You'll hear everything the repeaters around you pass along, with nothing to set up for regions.</p>
     <div class="chips"><span class="chip">Default: open</span><span class="chip">Hear everything</span><span class="chip">No region setup needed</span></div>
-    <div class="why"><strong>Indiana's starting point: nothing to scope.</strong> Leave every message and channel unscoped and you reach the most contacts, including across state lines. If a channel gets too busy, mute or leave it rather than scoping it. Repeater owners have their own page: <a href="../advanced/">Indiana region settings</a>.</div>
+    <div class="why"><strong>Indiana's starting point: nothing to scope.</strong> Leave every message and channel unscoped and you reach the most contacts, including across state lines. If a channel gets too busy, mute or leave it rather than scoping it. Repeater owners: see <a href="../advanced/">Advanced and theoretical</a>.</div>
   </header>
 
   <section aria-labelledby="start-h">
@@ -259,7 +260,7 @@ details.depth[open] { padding-bottom: 18px; }
       <table>
         <thead><tr><th>Group</th><th>Area</th><th>Region names they publish</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td><a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener"><b>Indiana Mesh</b></a></td><td>All of Indiana</td><td><code>us</code> <code>us-in</code> <code>us-oh</code> <code>us-ky</code> <code>us-mi</code> <code>us-il</code> (<a href="../advanced/">Indiana region settings</a>)</td><td><span class="status live">Discord</span></td></tr>
+          <tr><td><a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener"><b>Indiana Mesh</b></a></td><td>All of Indiana</td><td><code>us</code> <code>us-in</code> <code>us-oh</code> <code>us-ky</code> <code>us-mi</code> <code>us-il</code> (proposals on <a href="../advanced/">Advanced</a>)</td><td><span class="status live">Discord</span></td></tr>
           <tr><td><a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a></td><td>Northeast Indiana: Allen County (Fort Wayne) first, then the northeast counties</td><td><code>us-in</code> <code>nei</code> <code>fwa</code> (defined, not enforced yet)</td><td><span class="status live">Published</span></td></tr>
           <tr><td><a href="https://www.cimesh.net" target="_blank" rel="noopener">Central Indiana Mesh Network</a></td><td>Central Indiana; MeshCore first since summer 2026, Meshtastic still welcome. Part of the OKI mesh; offers repeater hardware for good sites</td><td>Default USA MeshCore settings; no Indiana tags of its own published</td><td><span class="status live">Discord</span></td></tr>
           <tr><td><a href="https://btownmesh.org" target="_blank" rel="noopener">Btown Mesh</a></td><td>Bloomington area. Meshtastic first; MeshCore users welcome</td><td>Not published</td><td><span class="status">Organizing</span></td></tr>
@@ -277,180 +278,9 @@ details.depth[open] { padding-bottom: 18px; }
   </section>
 
   <section aria-labelledby="owner-h">
-    <h2 id="owner-h">For repeater owners: region scopes</h2>
-    <p class="owner-intro">Running a repeater? Phase 1 adds six region names and keeps everything open. Companion users can skip this part. The full Indiana reference, with county and district tags, is <a href="../advanced/">Indiana region settings</a>.</p>
-  <div class="frame" aria-label="Region map">
-    <div class="frame-head">
-      <span class="tag">us</span>
-      <p>The umbrella tag. Repeaters carry it so other groups' cross-state scoped traffic passes through Indiana.</p>
-    </div>
-    <div class="map">
-      <div class="cell in">
-        <div class="top"><span class="state">Indiana</span><a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Indiana Mesh on Discord</a></div>
-        <span class="tag big">us-in</span>
-        <div class="tags">
-          <span class="tag">us</span><span class="tag">us-in</span><span class="tag">us-oh</span><span class="tag">us-ky</span><span class="tag">us-mi</span><span class="tag">us-il</span>
-        </div>
-        <ul>
-          <li><strong><a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a></strong>
-            <span>Northeast Indiana, starting in Allen County (Fort Wayne). Say hi on their #public channel.</span></li>
-          <li><strong><a href="https://www.cimesh.net" target="_blank" rel="noopener">Central Indiana Mesh Network</a></strong>
-            <span>Central Indiana on MeshCore, part of the OKI mesh. Free repeater hardware for sites that extend coverage.</span></li>
-          <li><strong><a href="https://btownmesh.org" target="_blank" rel="noopener">Btown Mesh</a></strong>
-            <span>Bloomington area. Meshtastic first, MeshCore users welcome; still organizing.</span></li>
-        </ul>
-        <p class="count">The six proposed starting regions, so every border would already be covered. Current repeaters: the <a href="https://map.meshcore.io/?lat=39.85&amp;lon=-86.3&amp;zoom=7&amp;nodes=2" target="_blank" rel="noopener">MeshCore Map</a>.</p>
-      </div>
-
-      <div class="cell mi">
-        <div class="top"><span class="state">Michigan</span><span class="tag">us-mi</span></div>
-        <ul>
-          <li><strong><a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a></strong>
-            <span>Publishes its own region names:</span><span class="uses">midwest · mi · mi-west · grr</span></li>
-        </ul>
-      </div>
-
-      <div class="cell il">
-        <div class="top"><span class="state">Illinois</span><span class="tag">us-il</span></div>
-        <ul>
-          <li><strong><a href="https://chicagolandmesh.org" target="_blank" rel="noopener">Chicagoland Mesh</a></strong>
-            <span>Region names not published yet.</span></li>
-        </ul>
-      </div>
-
-      <div class="cell oh">
-        <div class="top"><span class="state">Ohio</span><span class="tag">us-oh</span></div>
-        <ul>
-          <li><strong><a href="https://nwomesh.com" target="_blank" rel="noopener">NWO Mesh</a></strong>
-            <span>Northwest Ohio, on Indiana's northeast border. Early deployment; region names not published yet.</span></li>
-          <li><strong><a href="https://neome.sh" target="_blank" rel="noopener">NEO Mesh</a></strong>
-            <span>Northeast and North Central Ohio. Region names not published yet.</span></li>
-          <li><strong><a href="https://okimesh.org" target="_blank" rel="noopener">OKI Mesh</a></strong>
-            <span>Southwest Ohio, see the corner tile.</span></li>
-        </ul>
-      </div>
-
-      <div class="cell ky">
-        <div class="top"><span class="state">Kentucky</span><span class="tag">us-ky</span></div>
-        <p>Northern Kentucky is covered by OKI Mesh.</p>
-      </div>
-
-      <div class="cell oki">
-        <div class="top"><span class="state">Cincinnati tri-state</span><span class="tag oki">oki</span></div>
-        <ul>
-          <li><strong><a href="https://okimesh.org" target="_blank" rel="noopener">OKI Mesh</a></strong>
-            <span>The OKI Regional Council area: Hamilton Co. and its adjacent counties. Butler, Clermont, Warren (OH), Boone, Campbell, Kenton (KY), Dearborn (IN).</span></li>
-          <li><span><a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">Their region plan</a> uses:</span>
-            <span class="uses">oki · us-midwest · us-oh · us-ky · us-in · cvg · day · ind …</span></li>
-        </ul>
-      </div>
-
-      <div class="cell tn">
-        <div class="top"><span class="state">Tennessee (south of KY)</span><span class="tag alt">us-tn</span></div>
-        <ul>
-          <li><strong><a href="https://nashme.sh" target="_blank" rel="noopener">NashMesh</a></strong>
-            <span>Greater Nashville. Proposed:</span><span class="uses">us · us-southeast · us-tn · us-tn-bna</span></li>
-          <li><strong><a href="https://tennmesh.carrd.co" target="_blank" rel="noopener">TennMesh</a></strong>
-            <span>East Tennessee.</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-
+    <h2 id="owner-h">Running a repeater?</h2>
+    <p class="owner-intro">Companion users need nothing beyond the steps above. Repeater owners: the official <a href="https://docs.meshcore.io/" target="_blank" rel="noopener">MeshCore docs</a> cover setup and the <a href="https://docs.meshcore.io/cli_commands/" target="_blank" rel="noopener">CLI</a>. Everything Indiana-specific for repeaters, from the open base commands and neighbours' tags to the three proposed region structures, lives on the <a href="../advanced/">Advanced and theoretical</a> page, and all of it is for consideration only.</p>
   </section>
-
-
-
-  <section aria-labelledby="setup-h">
-    <h2 id="setup-h">Set it up</h2>
-    <div class="setup">
-      <div class="panel">
-        <div class="head"><h3>Firmware 1.16 and newer</h3><button class="copy" type="button" data-copy="cmd116">Copy</button></div>
-<pre id="cmd116">region def us us-in|us us-oh|us us-ky|us us-mi|us us-il
-region allowf *
-region save
-region list allowed</pre>
-        <p class="note"><code>|us</code> means “go back to us”, so every state lands under <code>us</code>. Check the version first with <code>ver</code>. Full command reference: <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.</p>
-      </div>
-      <div class="panel">
-        <div class="head"><h3>Firmware 1.15 and openHop</h3><button class="copy" type="button" data-copy="cmd115">Copy</button></div>
-<pre id="cmd115">region put us
-region put us-in us
-region put us-oh us
-region put us-ky us
-region put us-mi us
-region put us-il us
-region allowf *
-region save</pre>
-        <p class="note">One region per line. Paste the lines one at a time.</p>
-      </div>
-    </div>
-    <ol class="steps">
-      <li>Run the commands on the repeater: USB serial, or the app's remote admin.</li>
-      <li><code>region list allowed</code> should show <code>*</code> plus all six names.</li>
-      <li>Companions need nothing.</li>
-    </ol>
-  </section>
-
-  <section aria-labelledby="border-h">
-    <h2 id="border-h">Repeaters near a border</h2>
-    <p class="owner-intro">The six tags already cover every neighbouring state. Near a group that uses its own names, add those too. They only let more traffic through.</p>
-    <div class="tablewrap">
-      <table class="addons">
-        <thead><tr><th>Your repeater is near</th><th>Also add</th><th>Command</th></tr></thead>
-        <tbody>
-          <tr><td>Michigan line</td><td>MichMesh's <code>mi</code>, <code>midwest</code></td><td><code>region put mi us</code><br><code>region put midwest us</code></td></tr>
-          <tr><td>Cincinnati area (the 8 OKI counties)</td><td>OKI Mesh's <code>oki</code>, <code>us-midwest</code></td><td><code>region put oki us</code><br><code>region put us-midwest us</code></td></tr>
-          <tr><td>Chicago, Louisville, Evansville, Ohio or Kentucky lines</td><td>Nothing extra</td><td>The six tags cover it</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="note">Want district or county tags, or a neighbouring group's tags, built for you? Use <a href="../advanced/">Indiana region settings</a>. It starts from these same open settings.</p>
-    <p class="note">Then <code>region save</code>. Neighbours' own region plans: <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>, <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>.</p>
-  </section>
-
-  <section aria-labelledby="rules-h">
-    <h2 id="rules-h">Keep the mesh open</h2>
-    <p class="why">Default open. Repeaters carry region names so other groups' scoped traffic passes through Indiana. Adding a region never blocks anything; each name only lets more scoped traffic through. Only <code>region default</code>, <code>region denyf *</code> and <code>flood.max.unscoped</code> restrict traffic, and Phase 1 leaves all three off.</p>
-    <div class="rules">
-      <div class="panel do">
-        <h3>Do</h3>
-        <ul>
-          <li>Keep unscoped traffic on with <code>region allowf *</code>.</li>
-          <li>Type names exactly: lowercase, no <code>#</code>. <code>us-in</code> is not <code>in</code> or <code>US-IN</code>.</li>
-          <li>Leave every message and channel unscoped. Mute a busy channel instead of scoping it.</li>
-        </ul>
-      </div>
-      <div class="panel dont">
-        <h3>Don't</h3>
-        <ul>
-          <li>Set <code>region default</code> on repeaters or companions.</li>
-          <li>Run <code>region denyf *</code> or <code>set flood.max.unscoped</code>.</li>
-          <li>Scope messages or channels as a new user. It limits who hears you.</li>
-          <li>Put comments in commands. Every extra word becomes a region.</li>
-        </ul>
-      </div>
-    </div>
-
-  </section>
-
-  <details class="depth">
-    <summary>In depth: how scoping works</summary>
-    <ul class="depth-list">
-      <li><strong>Unscoped is the default and stays on.</strong><span>A message with no scope is relayed by every repeater that allows <code>*</code>, which is all of them in Phase 1.</span></li>
-      <li><strong>A scoped message needs its exact tag on every repeater along the way.</strong><span>A repeater without that tag silently drops it. One repeater with no regions at all drops every scoped message.</span>
-        <span class="eg">sends ind → Indiana repeater (us, us-in, us-oh, us-ky, us-mi, us-il) → <span class="no">dropped</span>, no ind tag</span>
-        <span class="eg">sends us-in → same repeater → <span class="ok">forwarded</span></span></li>
-      <li><strong>Matching is per tag, never by hierarchy.</strong><span><code>us</code> does not cover <code>us-in</code>. A border repeater carries several states; a message scoped <code>us-in</code> stops at the first repeater that lacks it.</span>
-        <span class="eg">sends us → every repeater carries us → <span class="ok">crosses all states</span></span></li>
-      <li><strong>Scope controls what you send, not what you hear.</strong><span>Any radio that hears a packet can read it, channel keys aside. A companion just over a state line still hears a message its nearby repeater relayed.</span></li>
-      <li><strong>Watch for the one-way reply trap.</strong><span>If someone replies scoped to a tag your side's repeaters lack, you never see it. Leaving messages unscoped avoids this entirely.</span></li>
-      <li><strong>Defaults change your own traffic too.</strong><span>A repeater or companion with a default region sends its own adverts and messages scoped. Phase 1 sets no default, so everything you send reaches everyone.</span></li>
-    </ul>
-    <p class="note">From the source: the MeshCore developer's post on <a href="https://blog.meshcore.io/2026/04/17/default-scope" target="_blank" rel="noopener">default scope</a> and the <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a> commands.</p>
-  </details>
-
 
   <footer>
     <span>Region names are as each group published them, checked Oct 2026.</span>
