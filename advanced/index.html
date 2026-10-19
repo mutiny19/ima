@@ -33,6 +33,7 @@
   --ok:#6cc58a; --warn:#e3a640; --crit:#ff8a80;
   --d1:#22312c;--d2:#2b2d22;--d3:#252a36;--d4:#302824;--d5:#1f3135;--d6:#2e2732;--d7:#263222;--d8:#332c1f;--d9:#232c34;--d10:#312a26;--d11:#2a3027; }
 .sb-head { display: grid; gap: 10px; }
+.proposal { margin: 14px 0 0; padding: 14px 16px; border: 2px solid var(--beacon); border-radius: 12px; background: var(--panel); font-size: 15px; line-height: 1.5; max-width: 80ch; }
 .mode { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 22px 0 18px; }
 .mode-btn { font: 700 15px/1 var(--body); border: 2px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 8px; padding: 12px 18px; min-height: 44px; cursor: pointer; }
 .mode-btn[aria-pressed="true"] { background: var(--beacon); border-color: var(--beacon); color: #13201C; }
@@ -248,14 +249,14 @@
   <header class="sb-head">
     <span class="eyebrow">Indiana · MeshCore repeaters</span>
     <h1>Indiana region settings</h1>
-    <p class="lead">The Indiana reference for repeater region tags. <strong>Phase 1</strong> is the starting set every Indiana repeater carries: <code>us</code> <code>us-in</code> <code>us-oh</code> <code>us-ky</code> <code>us-mi</code> <code>us-il</code>, with unscoped traffic allowed and no default region, so everything stays open. This page starts from Phase 1 and builds the commands as you add district, county, or neighbouring groups' tags. Adding tags only lets more scoped traffic through. Companion users need none of this. Neighbouring groups publish their own plans: <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>.</p>
-    <p class="sub">Click the county your repeater sits in, then every county it reaches. Everything is optional: with nothing selected the output is exactly Phase 1.</p>
+    <p class="lead">Three proposed structures for how Indiana MeshCore repeaters might tag regions, side by side so people can compare them. Each one starts from the same open base (<code>us</code> and <code>us-in</code>, unscoped traffic allowed, no default region) and differs only in how it names the places inside Indiana. Adding tags only lets more scoped traffic through, and companion users need none of this. Neighbouring groups publish their own plans: <a href="https://docs.okimesh.org/books/oki-mesh-alliance/page/oki-mesh-region-scopes" target="_blank" rel="noopener">OKI Mesh</a>, <a href="https://neimesh.net" target="_blank" rel="noopener">NEIMesh</a>, <a href="https://michmesh.com" target="_blank" rel="noopener">MichMesh</a>.</p>
+    <div class="proposal" role="note"><strong>Proposals only.</strong> None of the three structures below has been decided, and none should be put on a repeater yet. They are here so Indiana Mesh can look at them together and pick, change, or drop them. The commands each one produces are for evaluation; until the community settles on one, a repeater should carry only the open base and whatever a neighbouring group publishes. Discuss on the <a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Indiana Mesh Discord</a> or <a href="https://github.com/mutiny19/ima/issues/new/choose" target="_blank" rel="noopener">open an issue</a>.</div>
   </header>
   <div class="mode" role="group" aria-label="Choose a scoping style">
     <button type="button" class="mode-btn" id="modeSimple" aria-pressed="true">Simplest</button>
     <button type="button" class="mode-btn" id="modeAbbr" aria-pressed="false">Abbreviated</button>
     <button type="button" class="mode-btn" id="modeFull" aria-pressed="false">County &amp; district</button>
-    <span class="mode-help">Three ways to tag a repeater. <strong>Simplest</strong>: pick an airport and a third of the state, done. <strong>Abbreviated</strong>: the same tags, chosen on a map by metro and region, with neighbours. <strong>County &amp; district</strong>: the full builder, with Indiana's own county and district tags.</span>
+    <span class="mode-help">Three proposed structures, none adopted. <strong>Simplest</strong>: an airport and a third of the state. <strong>Abbreviated</strong>: metro and region tags chosen on a map, with neighbours. <strong>County &amp; district</strong>: the full builder, with county and IDHS district tags.</span>
   </div>
 
   <section id="simple" class="abbr" aria-labelledby="simple-h">
@@ -282,7 +283,7 @@
       </select>
       <pre id="simpleOut"></pre>
       <p class="note" id="simpleBudget"></p>
-      <p class="note">Run them on the repeater over USB serial or the app's remote admin, <strong>one line at a time</strong>, then <code>region list allowed</code> should show <code>*</code> plus every tag. Near a state line, or for a repeater between two metros, switch to <strong>Abbreviated</strong> for neighbours and a second metro.</p>
+      <p class="note">For evaluation; this structure is a proposal, not something to put on a repeater yet. If adopted, they would run on the repeater over USB serial or the app's remote admin, <strong>one line at a time</strong>, and then <code>region list allowed</code> should show <code>*</code> plus every tag. Near a state line, or for a repeater between two metros, switch to <strong>Abbreviated</strong> for neighbours and a second metro.</p>
     </section>
     <section class="method" aria-labelledby="simple-method-h">
       <h3 id="simple-method-h">Method</h3>
@@ -333,7 +334,7 @@
       <div class="alert" id="abbrAlert" role="alert" hidden></div>
       <pre id="abbrOut"></pre>
       <p class="note" id="abbrBudget"></p>
-      <p class="note">Run them on the repeater over USB serial or the app's remote admin, <strong>one line at a time</strong> (each line is its own command; the app sends one per message), then <code>region list allowed</code> should show <code>*</code> plus every tag. Companions need nothing. Reference: MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.</p>
+      <p class="note">For evaluation; this structure is a proposal, not something to put on a repeater yet. If adopted, they would run on the repeater over USB serial or the app's remote admin, <strong>one line at a time</strong> (each line is its own command; the app sends one per message), and then <code>region list allowed</code> should show <code>*</code> plus every tag. Companions need nothing. Reference: MeshCore's <a href="https://docs.meshcore.io/cli_commands/#region-management-v110" target="_blank" rel="noopener">Region Management</a>.</p>
       <div id="abbrChanPanel">
         <h4>Channel suggestions for what you picked</h4>
         <p class="sub">Scoping is for the rare message you want kept local. For everyday local chat, a channel does the job with nothing to configure on any repeater. Hashtag channels take their key from the name, so anyone who types the same name lands in the same room. Convention: <code>#</code> plus the place name, lowercase, letters only.</p>
@@ -468,7 +469,7 @@
             <button type="button" id="presetIn">Phase 1 only</button>
           </div>
         </div>
-        <p class="sub">Tags that reach beyond your county and district. Phase 1 is on for every Indiana repeater; add others only if your repeater should pass that group's scoped traffic. Tap Define for what each one means.</p>
+        <p class="sub">Tags that reach beyond your county and district. Phase 1 is the proposed starting set; add others only if your repeater should pass that group's scoped traffic. Tap Define for what each one means.</p>
         <div class="tagcards" id="tagCards"></div>
         <div class="tagcard">
           <div class="tc-head"><code class="tc-name">custom tag</code><button type="button" class="linkish" data-def="custom" aria-expanded="false">Define</button></div>
@@ -485,7 +486,7 @@
         </div>
         <div class="status" id="status"></div>
         <div class="meter" aria-hidden="true"><i id="meter"></i></div>
-        <p class="sub" id="cliHint">Send each step on its own, wait for the reply, then tick it off. Every step fits in one CLI message.</p>
+        <p class="sub" id="cliHint">For evaluation; this structure is a proposal, not something to put on a repeater yet. If adopted: send each step on its own, wait for the reply, then tick it off. Every step fits in one CLI message.</p>
         <ol class="clisteps" id="cliSteps"></ol>
         <ul class="warnlist" id="warnings"></ul>
         <details>
