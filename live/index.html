@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script>/* Follows the system theme; a visitor's own choice is remembered. Runs before paint to avoid a flash. */
-(function () { var t; try { t = localStorage.getItem("ioc-theme"); } catch (e) {} document.documentElement.setAttribute("data-theme", t === "light" || t === "dark" ? t : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")); })();</script>
+<script src="../assets/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Where to watch live MeshCore traffic in Indiana: the LetsMesh Packet Analyzer, MeshMapper's Indianapolis and Fort Wayne maps and the official MeshCore Map.">
 <title>Indiana Mesh Live</title>
@@ -141,22 +140,6 @@ section { display: grid; gap: 14px; }
 </div></footer>
 
 
-<script>
-(function () {
-  var m = document.getElementById("navMenu"), more = document.getElementById("navMore");
-  if (m) m.addEventListener("click", function () { var open = m.getAttribute("aria-expanded") === "true"; m.setAttribute("aria-expanded", String(!open)); more.classList.toggle("open", !open); });
-})();
-(function () {
-  var b = document.getElementById("themeBtn"), root = document.documentElement;
-  function sync() { var dark = root.getAttribute("data-theme") !== "light", l = dark ? "Switch to light mode" : "Switch to dark mode"; b.setAttribute("aria-label", l); b.title = l; }
-  b.addEventListener("click", function () {
-    var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("ioc-theme", next); } catch (e) {}
-    sync();
-  });
-  sync();
-})();
-</script>
+<script src="../assets/site.js"></script>
 </body>
 </html>

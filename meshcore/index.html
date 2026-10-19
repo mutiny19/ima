@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script>/* Follows the system theme; a visitor's own choice is remembered. Runs before paint to avoid a flash. */
-(function () { var t; try { t = localStorage.getItem("ioc-theme"); } catch (e) {} document.documentElement.setAttribute("data-theme", t === "light" || t === "dark" ? t : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")); })();</script>
+<script src="../assets/theme.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Work-in-progress quick start for new MeshCore users in Indiana, plus region scope suggestions for repeater owners and links to neighbouring mesh groups.">
 <title>Indiana MeshCore Start</title>
@@ -456,26 +455,6 @@ region save</pre>
   </footer>
 </div>
 
-<script>
-document.querySelectorAll("button.copy").forEach(function (btn) {
-  btn.addEventListener("click", function () {
-    var el = document.getElementById(btn.dataset.copy);
-    var text = el.textContent;
-    function selectIt() {
-      var r = document.createRange(); r.selectNodeContents(el);
-      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-      btn.textContent = "Selected: press Ctrl/Cmd+C";
-    }
-    try {
-      navigator.clipboard.writeText(text).then(function () {
-        btn.textContent = "Copied";
-        setTimeout(function () { btn.textContent = "Copy"; }, 1800);
-      }, selectIt);
-    } catch (e) { selectIt(); }
-  });
-});
-</script>
-
 <footer class="site-foot"><div class="bar">
   <span>Indiana Off-Grid Comms, a placeholder name, from the <a href="https://discord.gg/2uwyceSF37" target="_blank" rel="noopener">Indiana Mesh</a> community. Informational only. <a href="../#about">About this site</a> · <a href="https://github.com/mutiny19/ima" target="_blank" rel="noopener">Source</a> · <a href="https://github.com/mutiny19/ima/issues/new/choose" target="_blank" rel="noopener">Open an issue</a></span>
 </div></footer>
@@ -491,22 +470,6 @@ var d = (c.config && c.config.suggested_radio_settings && c.config.suggested_rad
   document.getElementById("pc").textContent = "CR" + d.coding_rate;
 }).catch(function () {});
 </script>
-<script>
-(function () {
-  var m = document.getElementById("navMenu"), more = document.getElementById("navMore");
-  if (m) m.addEventListener("click", function () { var open = m.getAttribute("aria-expanded") === "true"; m.setAttribute("aria-expanded", String(!open)); more.classList.toggle("open", !open); });
-})();
-(function () {
-  var b = document.getElementById("themeBtn"), root = document.documentElement;
-  function sync() { var dark = root.getAttribute("data-theme") !== "light", l = dark ? "Switch to light mode" : "Switch to dark mode"; b.setAttribute("aria-label", l); b.title = l; }
-  b.addEventListener("click", function () {
-    var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("ioc-theme", next); } catch (e) {}
-    sync();
-  });
-  sync();
-})();
-</script>
+<script src="../assets/site.js"></script>
 </body>
 </html>
